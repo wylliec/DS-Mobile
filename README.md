@@ -1,6 +1,6 @@
 # QDriverStation Mobile
 
-[![Build Status](https://travis-ci.org/WinT-3794/QDriverStation.svg?branch=master)](https://travis-ci.org/WinT-3794/QDriverStation-Mobile)
+[![Build Status](https://travis-ci.org/WinT-3794/DS-Mobile.svg?branch=master)](https://travis-ci.org/WinT-3794/DS-Mobile)
 [![License](https://img.shields.io/github/license/wint-3794/qdriverstation.svg)](https://github.com/WinT-3794/QDriverStation/blob/master/LICENSE)
 [![BitCoin donate button](https://img.shields.io/badge/bitcoin-donate-yellow.svg)](https://blockchain.info/address/1K85yLxjuqUmhkjP839R7C23XFhSxrefMx "Donate once-off to this project using BitCoin")
 
