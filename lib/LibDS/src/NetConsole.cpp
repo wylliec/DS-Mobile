@@ -29,7 +29,7 @@ DS_NetConsole::DS_NetConsole()
     connect (&m_socket, SIGNAL (readyRead()), this, SLOT (onDataReceived()));
 }
 
-void DS_NetConsole::setTeamNumber (int team)
+void DS_NetConsole::setTeamNumber (const int& team)
 {
     m_socket.bind (QHostAddress (DS_GetStaticIp (team, 255)),
                    DS_Ports::NetConsole,
@@ -47,5 +47,6 @@ void DS_NetConsole::onDataReceived()
     }
 
     /* Notify other objects */
-    emit newMessage (QString::fromUtf8 (data));
+    if (!data.isEmpty())
+        emit newMessage (QString::fromUtf8 (data));
 }

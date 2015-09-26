@@ -29,10 +29,14 @@ DS_Receiver::DS_Receiver()
     connect (&m_socket, SIGNAL (readyRead()), this, SLOT (onDataReceived()));
 }
 
+void DS_Receiver::setControlMode (const DS_ControlMode& mode)
+{
+    m_controlMode = mode;
+}
+
 void DS_Receiver::onDataReceived()
 {
     while (m_socket.hasPendingDatagrams()) {
-
         /* Read the socket data */
         QByteArray data;
         data.resize (m_socket.pendingDatagramSize());
@@ -48,7 +52,14 @@ void DS_Receiver::onDataReceived()
         /* Only notify about code change if necessary */
         if (m_code != packet.hasCode) {
             m_code = packet.hasCode;
-            emit userCodeChanged (m_code);
+            emit userCodeChanged (packet.hasCode);
+        }
+
+        /* Notify the Driver Station if the confirmation code of the robot
+         * is different than the control mode set by the DS */
+        if (m_controlMode != packet.controlMode) {
+            m_controlMode = packet.controlMode;
+            emit controlModeChanged (m_controlMode);
         }
 
         /* Send current date/time to robot */
@@ -58,7 +69,7 @@ void DS_Receiver::onDataReceived()
     }
 }
 
-DS_RobotPacket DS_Receiver::getRobotPacket (QByteArray data)
+DS_RobotPacket DS_Receiver::getRobotPacket (const QByteArray& data)
 {
     DS_RobotPacket receiver;
 
@@ -75,9 +86,8 @@ DS_RobotPacket DS_Receiver::getRobotPacket (QByteArray data)
     /* Get the confirmation code of control mode */
     receiver.controlMode = (DS_ControlMode) data.at (3);
 
-    /* Get current mode and determine if user code is present */
-    receiver.programMode = (DS_ProgramMode) data.at (4);
-    receiver.hasCode = (receiver.programMode != DS_ProgramNoCode);
+    /* Determine if user code is present */
+    receiver.hasCode = (data.at (4) != DS_ProgramNoCode);
 
     /* Calculate the voltage */
     QString major = QString::number (data.at (5));
@@ -86,7 +96,7 @@ DS_RobotPacket DS_Receiver::getRobotPacket (QByteArray data)
     if (minor.length() > 2)
         minor = QString ("%1%2").arg (minor.at (0), minor.at (1));
 
-    else if (minor.length() == 1)
+    if (minor.length() == 1)
         minor = QString ("0%1").arg (minor);
 
     receiver.voltageString = QString ("%1.%2").arg (major, minor);

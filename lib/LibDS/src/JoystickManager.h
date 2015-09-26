@@ -25,6 +25,8 @@
 
 #include <QList>
 #include <QObject>
+#include <QBitArray>
+#include <QByteArray>
 
 /**
  * \class DS_JoystickManager
@@ -40,43 +42,28 @@ class DS_JoystickManager : public QObject
 {
     Q_OBJECT
 
+public:
+    DS_JoystickManager();
+    ~DS_JoystickManager();
+
 private:
-    /**
-     * @internal
-     * Represents a joystick axis
-     */
-    struct Axis {
-        double value;
-    };
-
-    /**
-     * @internal
-     * Represents a joystick button
-     */
-    struct Button {
-        bool pressed;
-    };
-
-    /**
-     * @internal
-     * Represents a joystick POV
-     */
-    struct Pov {
-        short angle;
-    };
-
     /**
      * @internal
      * Represents a joystick, its used to access the values of the registered
      * joystick axes and buttons.
      */
     struct Joystick {
-        int id;
-        QList <Pov*> povs;
-        QList <Axis*> axes;
-        QList <Button*> buttons;
+        int numHats;
+        int numAxes;
+        int numButtons;
+        char* axes;
+        char* hats;
+        bool* buttons;
     };
 
+    int m_currentJoystick;
+
+    Joystick* m_tempJoystick;
     QList <Joystick*> m_joysticks;
 
 public slots:
@@ -94,33 +81,51 @@ public slots:
     /**
      * Unregisters the selected \a joystick from the Driver Station
      */
-    void removeJoystick (int joystick);
+    void removeJoystick (const short& js);
 
     /**
      * Registers a new joystick  to the Driver Station with the selected number
      * of \a axes and \a buttons
      */
-    void addJoystick (int axes, int buttons);
+    void addJoystick (const short& axes, const short& buttons, const short& hats);
+
+
+    /**
+     * Updates the \a angle of the \a hat in the selected \a joystick
+     */
+    void updateHat (const short& js,
+                    const short& hat,
+                    const int& angle);
 
     /**
      * Updates the \a value of the \a axis in the selected \a joystick
      */
-    void updateAxis (int joystick, int axis, double value);
+    void updateAxis (const short& js,
+                     const short& axis,
+                     const double& value);
 
     /**
      * Updates the \a pressed state of the \a button in the selected \a joystick
      */
-    void updateButton (int joystick, int button, bool pressed);
-
-    /**
-     * Updates the \a angle of the seleccted \a pov in the \a joystick
-     */
-    void updatePov (int joystick, int pov, short angle);
+    void updateButton (const short& js,
+                       const short& button,
+                       const bool& pressed);
 
     /**
      * Returns the size of a joystick structure
      */
     int getJoystickSize (const Joystick* joystick);
+
+    /**
+     * Returns the number of bits in a button structure of the selected
+     * \a joystick
+     */
+    int getButtonBytes (const Joystick* joystick);
+
+    /**
+     * Converts the input \a bits to bytes
+     */
+    QByteArray bitsToBytes (QBitArray bits);
 };
 
 #endif /* _DRIVER_STATION_JOYSTICK_MANAGER_H */
