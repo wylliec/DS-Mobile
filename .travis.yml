@@ -8,5 +8,5 @@ before_install:
     - sudo apt-get install -qq qt5-qmake libpulse-dev qtbase5-dev qtdeclarative5-dev libqt5svg5-dev qtmultimedia5-dev libqt5webkit5-dev libsqlite3-dev mesa-common-dev libglu1-mesa-dev
     
 script: 
-    - qmake -qt=qt5 Mobile.pro
+    - qmake -qt=qt5 DS-Mobile.pro
     - make -j4
