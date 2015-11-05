@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file>main.qml</file>
+        <file>dialogs/About.qml</file>
+        <file>sections/Diagnostics.qml</file>
+        <file>sections/NetConsole.qml</file>
+        <file>sections/Preferences.qml</file>
+        <file>sections/RobotControl.qml</file>
+        <file>sections/SoftwareVersions.qml</file>
+        <file>sections/SystemMonitor.qml</file>
+        <file>dialogs/ColorPicker.qml</file>
+        <file>widgets/SmartPage.qml</file>
+        <file>widgets/Axis.qml</file>
+        <file>widgets/Joystick.qml</file>
+        <file>interfaces/Settings.qml</file>
+        <file>interfaces/qmldir</file>
+    </qresource>
+</RCC>

@@ -21,7 +21,8 @@
  */
 
 #include <QObject>
-#include <DriverStation.h>
+#include <QSettings>
+#include <QApplication>
 
 class Settings : public QObject
 {
@@ -29,4 +30,48 @@ class Settings : public QObject
 
 public:
     explicit Settings();
+    ~Settings();
+
+public slots:
+    /**
+     * Saves the \a value to the input \a key
+     */
+    Q_INVOKABLE void set (QString key, QVariant value);
+
+    /**
+     * Returns the associated value with the \a key.
+     * If the \a key is not found, the function will return
+     * the \a defValue
+     */
+    Q_INVOKABLE QVariant get (QString key, QVariant defValue);
+
+    /**
+     * Returns the associated value with the \a key and converts
+     * it into a \c boolean
+     *
+     * If the \a key is not found, the function will return
+     * the \a defValue
+     */
+    Q_INVOKABLE bool getBool (QString key, QString defValue);
+
+    /**
+     * Returns the associated value with the \a key and converts
+     * it into a \c double
+     *
+     * If the \a key is not found, the function will return
+     * the \a defValue
+     */
+    Q_INVOKABLE double getNumber (QString key, double defValue);
+
+    /**
+     * Returns the associated value with the \a key and converts
+     * it into a \c QString
+     *
+     * If the \a key is not found, the function will return
+     * the \a defValue
+     */
+    Q_INVOKABLE QString getString (QString key, QString defValue);
+
+private:
+    QSettings* m_settings;
 };

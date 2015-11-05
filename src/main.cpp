@@ -20,12 +20,29 @@
  * THE SOFTWARE.
  */
 
-#include <Falcon.h>
+#include <QUrl>
+#include <QClipboard>
+#include <QQmlContext>
+#include <QApplication>
+#include <DriverStation.h>
+#include <QQmlApplicationEngine>
 
-/**
- * Main entry point of the application
- */
+#include "settings.h"
+
 int main (int argc, char* argv[])
 {
-    return Falcon::StartApp (argc, argv, "qrc:/main.qml");
+    QApplication app (argc, argv);
+    app.setOrganizationName ("WinT 3794");
+    app.setApplicationName  ("QDriverStation Mobile");
+
+    Settings* st = new Settings();
+    DriverStation* ds = DriverStation::getInstance();
+
+    QQmlApplicationEngine engine;
+    engine.addImportPath ("qrc:/Material/modules/");
+    engine.rootContext()->setContextProperty ("c_ds", ds);
+    engine.rootContext()->setContextProperty ("c_settings", st);
+    engine.load (QUrl (QStringLiteral ("qrc:/qml/main.qml")));
+
+    return app.exec();
 }
