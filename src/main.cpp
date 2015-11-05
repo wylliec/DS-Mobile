@@ -27,7 +27,7 @@
 #include <DriverStation.h>
 #include <QQmlApplicationEngine>
 
-#include "settings.h"
+#include "Settings.h"
 
 int main (int argc, char* argv[])
 {
