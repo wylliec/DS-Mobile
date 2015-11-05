@@ -9,6 +9,8 @@ QDriverStation Mobile is an open-source, cross-platform alternative to the FRC D
 
 The actual code that moves and manages a FRC robot is found in a [separate repository](https://github.com/WinT-3794/LibDS), which you can use in your own Qt projects or change it to support older (and future) communication protocols. 
 
+Click [here](https://github.com/wint-3794/qdriverstation) for the **desktop** version!
+
 [![Screenshot](/etc/screenshots/Win.png)](https://raw.githubusercontent.com/WinT-3794/DS-Mobile/master/etc/screenshots/Win.png)
 
 ### Build instructions
