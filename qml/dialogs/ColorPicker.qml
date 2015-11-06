@@ -48,15 +48,14 @@ Dialog {
                 "red", "pink", "purple", "deepPurple", "indigo",
                 "blue", "lightBlue", "cyan", "teal", "green",
                 "lightGreen", "lime", "yellow", "amber", "orange",
-                "deepOrange", "grey", "blueGrey", "brown", "black",
-                "white"
+                "deepOrange", "grey", "blueGrey", "brown"
             ]
 
             Rectangle {
                 width: Units.dp(30)
                 height: Units.dp(30)
                 radius: Units.dp(2)
-                color: Palette.colors[modelData]["500"]
+                color: Palette.colors [modelData]["600"]
                 border.width: modelData === "white" ? Units.dp(2) : 0
                 border.color: Theme.alpha ("#000", 0.26)
 

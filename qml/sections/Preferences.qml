@@ -25,53 +25,39 @@ import Material 0.1
 import Material.ListItems 0.1 as ListItem
 
 import "../dialogs"
-import "../widgets"
 import "../interfaces"
 
-SmartPage {
-    id: page
-
+Item {
     View {
         id: view
         elevation: 1
-        anchors.centerIn: parent
-        anchors.margins: Units.dp (32)
 
-        width: {
-            if (showAsMobile)
-                return page.width - Units.dp (32)
-
-            return widgets.implicitWidth + Units.dp (32)
+        anchors {
+            left: parent.left
+            right: parent.right
+            margins: Units.dp (32)
+            verticalCenter: parent.verticalCenter
         }
 
-        height: widgets.implicitHeight + Units.dp (32)
+        height: column.implicitHeight + Units.dp (32)
 
         Column {
-            id: widgets
-            width: widgetWidth
-            anchors.centerIn: parent
+            id: column
+            anchors.fill: parent
+            anchors.margins: Units.dp (16)
 
-            /*
-             * Section header
-             */
             Label {
                 style: "body2"
                 text:  "Networking Settings"
             } ListItem.Divider {}
 
-            /*
-             * Custom robot address
-             */
-            ListItem.SimpleMenu {
+            ListItem.Subtitled {
                 subText: robotAddress.value
                 text: qsTr ("Robot Address")
                 onClicked: robotAddress.show()
-                iconName: "device/developer_mode"
+                iconName: "device/network_wifi"
             }
 
-            /*
-             * Team number
-             */
             ListItem.Subtitled {
                 iconName: "content/flag"
                 subText: teamNumber.value
@@ -79,26 +65,17 @@ SmartPage {
                 onClicked: teamNumber.show()
             }
 
-            /*
-             * Section header
-             */
             Label {
                 style: "body2"
                 text:  "Other options"
             } ListItem.Divider {}
 
-            /*
-             * Team number
-             */
             ListItem.Subtitled {
                 iconName: "image/color_lens"
                 onClicked: colorPicker.show()
                 text: qsTr ("Change Appearance")
             }
 
-            /*
-             * Buttons
-             */
             Item {
                 height: reset.height
                 anchors.left: parent.left
@@ -119,9 +96,6 @@ SmartPage {
         }
     }
 
-    /*
-     * Team number dialog
-     */
     InputDialog {
         id: teamNumber
         value: Settings.teamNumber
@@ -132,9 +106,6 @@ SmartPage {
         }
     }
 
-    /*
-     * Custom network address dialog
-     */
     InputDialog {
         id: robotAddress
         value: Settings.address()
@@ -142,9 +113,6 @@ SmartPage {
         onAccepted: Settings.setRobotAddress (value)
     }
 
-    /*
-     * Reset settings dialog
-     */
     Dialog {
         id: resetDialog
         title: qsTr ("Reset Settings")
@@ -158,9 +126,6 @@ SmartPage {
         }
     }
 
-    /*
-     * Changes color settings
-     */
     ColorPicker {
         id: colorPicker
     }

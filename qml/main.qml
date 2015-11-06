@@ -30,7 +30,10 @@ import "interfaces"
 ApplicationWindow {
     id: app
     visible: true
-    Component.onCompleted: showMaximized()
+    Component.onCompleted: {
+        Units.gridUnit = Units.dp (56)
+        showMaximized()
+    }
 
     /*
      * Sections of the general tab
@@ -63,22 +66,7 @@ ApplicationWindow {
     initialPage: TabbedPage {
         id: page
         title: "QDriverStation"
-
-        /*
-         * Navigate through the application with the back button
-         */
         backAction: navDrawer.action
-
-        /*
-         * Define the about and settings buttons
-         */
-        actions: [
-            Action {
-                name: qsTr ("About")
-                onTriggered: about.show()
-                iconName: "action/info_outline"
-            }
-        ]
 
         /*
          * The sidebar that allows us to choose the program sections

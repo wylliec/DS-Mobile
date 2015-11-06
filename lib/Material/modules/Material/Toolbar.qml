@@ -64,7 +64,7 @@ View {
                             ? page.backgroundColor : page.actionBar.backgroundColor
                           : Theme.primaryColor
 
-    implicitHeight: Units.gu(1)
+    implicitHeight: Units.gu (1)
     height: targetHeight
     elevation: backgroundColor === page.color ? 0 : page.actionBar.elevation
     fullWidth: true

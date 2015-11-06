@@ -128,8 +128,8 @@ Object {
      */
     function updateAppAppearance() {
         Theme.tabHighlightColor = "#fff"
-        Theme.accentColor = Palette.colors [accentColor]["500"]
-        Theme.primaryColor = Palette.colors [primaryColor]["500"]
+        Theme.accentColor = Palette.colors [accentColor]["600"]
+        Theme.primaryColor = Palette.colors [primaryColor]["600"]
         Theme.primaryDarkColor = Palette.colors [primaryColor]["700"]
     }
 

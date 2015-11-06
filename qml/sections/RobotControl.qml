@@ -27,155 +27,91 @@ import Material.ListItems 0.1 as ListItem
 import "../widgets"
 import "../interfaces"
 
-SmartPage {
-    id: page
+Item{
 
-    Component.onCompleted: joystick.hide()
-    /*
-     * Enables the robot and shows the joysticks
-     */
+    Component.onCompleted: controls.show()
+
     function enableRobot() {
+        button.checked = true
+
         switch (controlModes.selectedIndex)
         {
-            /* TeleOp, hide controls and show josyticks */
         case 0:
-            joystick.show()
-            controlCard.hide()
+            controls.hide()
             c_ds.setControlMode (c_ds.Teleoperated)
             break
-
-            /* Autonomous, just switch modes */
         case 1:
             c_ds.setControlMode (c_ds.Autonomous)
             break
-
-            /* Test mode, just switch modes */
         case 2:
             c_ds.setControlMode (c_ds.Test)
             break
-
-            /* E-Stop, just switch modes */
         case 3:
             c_ds.setControlMode (c_ds.EmergencyStop)
             break
-
-            /* Do nothing */
         default:
             disableRobot()
             break
         }
     }
 
-    /*
-     * Disables the robot and hides the joysticks
-     */
     function disableRobot() {
-        joystick.hide()
-        controlCard.show()
+        controls.show()
+        button.checked = false
         c_ds.setControlMode (c_ds.Disabled)
     }
 
-    /*
-     * Returns \c true if the robot can be enabled
-     */
-    function canBeEnabled() {
-        return communications.available && code.available
-    }
-
-    /*
-     * Update UI when receiving signals from the DS
-     */
     Connections {
         target: c_ds
         onCodeChanged: code.available = c_ds.robotHasCode()
         onCommunicationsChanged: communications.available = c_ds.networkAvailable()
     }
 
-    /*
-     * Shows 'notifications' to the user
-     */
     Snackbar {
         z: 1
         id: snackbar
     }
 
-    /*
-     * Control widget
-     */
-    View {
-        elevation: 1
-        id: controlCard
-
-        width:  {
-            if (enableBt.elevation === 0)
-                return enableBt.width
-
-            else if (showAsMobile)
-                return page.width - Units.dp (32)
-
-            return widgets.implicitWidth + Units.dp (32)
-
-        }
-
-        height:  {
-            if (enableBt.elevation === 0)
-                return enableBt.height
-
-            return widgets.implicitHeight + Units.dp (32)
-        }
+    Column {
+        id: main
+        spacing: Units.dp (16)
 
         anchors {
+            left: parent.left
+            right: parent.right
             margins: Units.dp (32)
-            horizontalCenter: parent.horizontalCenter
-            top: enableBt.elevation === 0 ? parent.top : undefined
-            verticalCenter: enableBt.elevation === 0 ? undefined : parent.verticalCenter
+            verticalCenter: parent.verticalCenter
         }
 
-        function hide() {
-            controlItems.hide()
-            enableBt.elevation = 0
-        }
+        View {
+            id: controls
+            elevation: 1
+            anchors.left: parent.left
+            anchors.right: parent.right
 
-        function show() {
-            controlItems.show()
-            enableBt.elevation = 1
-        }
+            function hide() {
+                height = 0
+                opacity = 0
+            }
 
-        Column {
-            id: widgets
-            spacing: Units.gu (0.3)
-            anchors.centerIn: parent
+            function show() {
+                opacity = 1
+                height = column.implicitHeight + Units.dp (32)
+            }
 
-            /*
-             * Contains everything except the enable/disable button
-             */
+            Behavior on height  {NumberAnimation{}}
+            Behavior on opacity {NumberAnimation{}}
+
             Column {
-                width: widgetWidth
-                id: controlItems
+                id: column
+                anchors.fill: parent
+                anchors.margins: Units.dp (16)
 
-                function show() {
-                    opacity = 1
-                    height = implicitHeight
-                }
-
-                function hide() {
-                    height = 0
-                    opacity = 0
-                }
-
-                Behavior on opacity {NumberAnimation{}}
-
-                /*
-                 * Section header
-                 */
                 Label {
                     style: "body2"
                     text:  "Robot/Client Status"
                 } ListItem.Divider {}
 
-                /*
-                 * Communications switch
-                 */
                 ListItem.Subtitled {
                     id: communications
                     text: qsTr ("Communications")
@@ -186,9 +122,6 @@ SmartPage {
                     property bool available: false
                 }
 
-                /*
-                 * Code switch
-                 */
                 ListItem.Subtitled {
                     id: code
                     iconName: "action/code"
@@ -199,35 +132,23 @@ SmartPage {
                     property bool available: false
                 }
 
-                /*
-                 * Spacer
-                 */
                 Item {
                     width:  Units.dp (8)
                     height: Units.dp (8)
                 }
 
-                /*
-                 * Section header
-                 */
                 Label {
                     style: "body2"
                     text:  "Control Options"
                 } ListItem.Divider {}
 
-                /*
-                 * Control mode selector
-                 */
                 ListItem.SimpleMenu {
                     id: controlModes
                     iconName: "action/build"
                     text: qsTr ("Control Mode")
                     subText: model [selectedIndex]
 
-                    onSelectedIndexChanged: {
-                        enableBt.checked = false
-                        c_ds.setControlMode (c_ds.Disabled)
-                    }
+                    onSelectedIndexChanged: disableRobot()
 
                     model: [
                         qsTr ("TeleOperated"),
@@ -237,19 +158,14 @@ SmartPage {
                     ]
                 }
 
-
-                /*
-                 * Alliance selector
-                 */
                 Item {
                     id: allianceSelector
 
-                    width: widgetWidth
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+
                     height: positionList.height
 
-                    /*
-                     * The alliance color selector
-                     */
                     Button {
                         id: colorBt
                         elevation: 1
@@ -265,9 +181,6 @@ SmartPage {
                         }
                     }
 
-                    /*
-                     * The position selector
-                     */
                     ListItem.SimpleMenu {
                         id: positionList
                         text: qsTr ("Position")
@@ -286,50 +199,27 @@ SmartPage {
                     }
                 }
             }
+        }
 
-            /*
-             * Enable/Disable button
-             */
-            Button {
-                id: enableBt
-                elevation: 1
-                checkable: true
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: checked ? qsTr ("Disable") : qsTr ("Enable")
-                width: elevation === 0 ? page.width - Units.dp (64) : widgetWidth
+        Button {
+            id: button
+            elevation: 1
+            checkable: true
+            anchors.left: parent.left
+            anchors.right: parent.right
 
-                backgroundColor: checked && controlModes.selectedIndex === 0 ?
-                                     Palette.colors ["red"]["500"] : Theme.primaryColor
+            text: checked ? qsTr ("Disable") : qsTr ("Enable")
+            backgroundColor: checked ? Palette.colors ["red"]["500"] : Theme.primaryColor
 
-                /*
-                 * Notify the user when the robot cannot be enabled
-                 */
-                onCheckedChanged: {
-                    if (!canBeEnabled() && checked) {
-                        checked = false
-                        snackbar.open (qsTr ("Robot cannot be enabled with current conditions"))
-                    }
+            onClicked: {
+                if (c_ds.canBeEnabled() && checked)
+                    enableRobot()
 
-                    checked ? enableRobot() : disableRobot()
+                else {
+                    disableRobot()
+                    snackbar.open (qsTr ("Cannot enable robot with current conditions"))
                 }
             }
-        }
-    }
-
-    /*
-     * Represents a virtual joystick
-     */
-    Joystick {
-        id: joystick
-
-        anchors {
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-            top: controlCard.bottom
-
-            margins: Units.dp (32)
-            topMargin: Units.dp (16)
         }
     }
 }

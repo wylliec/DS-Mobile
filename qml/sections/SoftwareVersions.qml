@@ -24,12 +24,7 @@ import QtQuick 2.4
 import Material 0.1
 import Material.ListItems 0.1 as ListItem
 
-import "../widgets"
-import "../interfaces"
-
-SmartPage {
-    id: page
-
+Item {
     Component.onCompleted: reset()
 
     function reset() {
@@ -49,22 +44,20 @@ SmartPage {
     View {
         id: view
         elevation: 1
-        anchors.centerIn: parent
-        anchors.margins: Units.dp (32)
 
-        width: {
-            if (showAsMobile)
-                return page.width - Units.dp (32)
-
-            return widgets.implicitWidth + Units.dp (32)
+        anchors {
+            left: parent.left
+            right: parent.right
+            margins: Units.dp (32)
+            verticalCenter: parent.verticalCenter
         }
 
-        height: widgets.implicitHeight + Units.dp (32)
+        height: column.implicitHeight + Units.dp (32)
 
         Column {
-            id: widgets
-            width: widgetWidth
-            anchors.centerIn: parent
+            id: column
+            anchors.fill: parent
+            anchors.margins: Units.dp (16)
 
             Label {
                 style: "body2"

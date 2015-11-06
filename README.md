@@ -11,7 +11,7 @@ The actual code that moves and manages a FRC robot is found in a [separate repos
 
 Click [here](https://github.com/wint-3794/qdriverstation) for the **desktop** version!
 
-[![Screenshot](/etc/screenshots/Win.png)](https://raw.githubusercontent.com/WinT-3794/DS-Mobile/master/etc/screenshots/Win.png)
+[![Screenshot](/etc/screenshots/Android.png)](https://raw.githubusercontent.com/WinT-3794/DS-Mobile/master/etc/screenshots/Android.png)
 
 ### Build instructions
 

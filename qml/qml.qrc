@@ -9,7 +9,6 @@
         <file>sections/SoftwareVersions.qml</file>
         <file>sections/SystemMonitor.qml</file>
         <file>dialogs/ColorPicker.qml</file>
-        <file>widgets/SmartPage.qml</file>
         <file>widgets/Axis.qml</file>
         <file>widgets/Joystick.qml</file>
         <file>interfaces/Settings.qml</file>

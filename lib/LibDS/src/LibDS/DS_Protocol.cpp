@@ -21,6 +21,7 @@
  */
 
 #include "LibDS/DS_Protocol.h"
+#include <qdebug.h>
 
 DS_Protocol::DS_Protocol()
 {
