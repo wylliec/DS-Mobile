@@ -30,7 +30,7 @@ MouseArea {
     id: view
 
     clip: true
-    hoverEnabled: !Device.isMobile
+    hoverEnabled: false
     z: 2
 
     property int startRadius: circular ? width/10 : width/6

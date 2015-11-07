@@ -32,7 +32,7 @@ Object {
     property int teamNumber: c_settings.getNumber ("Team", 0)
     property int position: c_settings.getNumber ("Position", 0)
     property bool allianceIsBlue: c_settings.getBool ("Blue", false)
-    property string robotAddress: c_settings.getString ("Address", "")
+    property string robotAddress: c_settings.get ("Address", "")
     property bool firstLaunch: c_settings.getBool ("First Launch", true)
 
     /* Window-related stuff */
@@ -42,8 +42,8 @@ Object {
     property int height: c_settings.getNumber ("height", Units.dp (600))
 
     /* Theming stuff */
-    property string accentColor: c_settings.getString ("Accent color", "blueGrey")
-    property string primaryColor: c_settings.getString ("Primary color", "blueGrey")
+    property string accentColor: c_settings.get ("Accent color", "blueGrey")
+    property string primaryColor: c_settings.get ("Primary color", "blueGrey")
 
     /*
      * Applies saved settings
