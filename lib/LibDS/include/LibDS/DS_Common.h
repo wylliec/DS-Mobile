@@ -25,6 +25,10 @@
 #define _LIB_DS_COMMON_H
 
 #include "DS_Global.h"
+
+#include <QString>
+#include <QDateTime>
+#include <QUdpSocket>
 #include <QStringList>
 
 /**
@@ -86,7 +90,7 @@ QByteArray  LIB_DS_DECL DS_ToBytes (t input)
  * Returns the current timezone code by calculating the difference between
  * the system timezone and the UTC timezone
  */
-QString LIB_DS_DECL DS_GetTimezoneCode();
+QString LIB_DS_DECL DS_GetTimezoneCode ();
 
 /**
  * Returns a calculated IP address based on the team address.
@@ -103,5 +107,10 @@ QString LIB_DS_DECL DS_GetStaticIp (int team, int host);
  * Returns an user-friendly string given the inputed robot control mode
  */
 QString LIB_DS_DECL DS_GetControlModeString (DS_ControlMode mode);
+
+/**
+ * Reads the contents of the \a socket and returns its data
+ */
+QByteArray LIB_DS_DECL DS_GetSocketData (QUdpSocket* socket);
 
 #endif

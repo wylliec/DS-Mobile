@@ -36,23 +36,18 @@ Item {
     Connections {
         target: c_ds
         onCommunicationsChanged: reset()
-        onLibVersionChanged: lib.subText = data
-        onPdpVersionChanged: pdp.subText = data
-        onPcmVersionChanged: pcm.subText = data
+        onLibVersionChanged: lib.subText = version
+        onPdpVersionChanged: pdp.subText = version
+        onPcmVersionChanged: pcm.subText = version
     }
 
     View {
         id: view
-        elevation: 1
 
         anchors {
-            left: parent.left
-            right: parent.right
+            fill: parent
             margins: Units.dp (32)
-            verticalCenter: parent.verticalCenter
         }
-
-        height: column.implicitHeight + Units.dp (32)
 
         Column {
             id: column

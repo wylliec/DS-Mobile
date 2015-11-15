@@ -20,9 +20,50 @@
  * THE SOFTWARE.
  */
 
-import QtQuick 2.4
-import Material 0.1
+#pragma once
+#ifndef _DS_MOBILE_UPDATER_H
+#define _DS_MOBILE_UPDATER_H
 
-Item {
+#include <QObject>
+#include <QApplication>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QNetworkAccessManager>
 
-}
+#include "Settings.h"
+
+class Updater : public QObject
+{
+    Q_OBJECT
+
+public:
+    explicit Updater();
+
+signals:
+    void updateAvailable (QString version,
+                          QString downloadLink);
+
+public slots:
+    Q_INVOKABLE void checkForUpdates();
+
+private slots:
+    void showUpdateMessages();
+    void onFinished (QNetworkReply* reply);
+    void readDownloadLink (QByteArray data);
+    void readApplicationVersion (QByteArray data);
+
+    QString readKey (QString data, QString key);
+
+private:
+    bool m_updateAvailable;
+
+    QString m_version;
+    QString m_platform;
+    QString m_downloadLink;
+
+    Settings m_settings;
+
+    QNetworkAccessManager m_accessManager;
+};
+
+#endif

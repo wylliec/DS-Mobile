@@ -32,7 +32,7 @@ Item {
 
     Connections {
         target: c_ds
-        onNewMessage: log.append (data)
+        onNewMessage: log.append (message)
     }
 
     Column {

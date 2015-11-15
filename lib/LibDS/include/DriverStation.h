@@ -27,7 +27,7 @@
 #include "LibDS/DS_Common.h"
 
 class DS_Client;
-class DS_Protocol;
+class DS_ProtocolBase;
 class DS_NetConsole;
 class DS_ElapsedTime;
 class DS_ProtocolManager;
@@ -50,10 +50,10 @@ class LIB_DS_DECL DriverStation : public QObject
     Q_ENUMS (AllianceType)
 
 public:
-    explicit DriverStation();
-    ~DriverStation();
+    explicit DriverStation ();
+    ~DriverStation ();
 
-    static DriverStation* getInstance();
+    static DriverStation* getInstance ();
 
     /**
      * The available protocols for the user
@@ -99,7 +99,7 @@ public:
      * This function is useful in the case that you want to warn the user
      * when he/she clicks the 'Enable' button and something is not working
      */
-    Q_INVOKABLE bool canBeEnabled();
+    Q_INVOKABLE bool canBeEnabled ();
 
     /**
      * Returns a list with the available alliances and positions that the robot
@@ -108,54 +108,54 @@ public:
      * This is used by the robot program to change its behaviour depending on
      * the alliance (Blue or Red) and position (1, 2 & 3) of the robot.
      */
-    Q_INVOKABLE QStringList alliances();
+    Q_INVOKABLE QStringList alliances ();
 
     /**
      * Returns a list with the available protocols that we can use to drive
      * a FRC robot.
      */
-    Q_INVOKABLE QStringList protocols();
+    Q_INVOKABLE QStringList protocols ();
 
     /**
      * Returns the IP address of the robot radio
      */
-    Q_INVOKABLE QString radioAddress();
+    Q_INVOKABLE QString radioAddress ();
 
     /**
      * Returns the network address of the robot
      */
-    Q_INVOKABLE QString robotAddress();
+    Q_INVOKABLE QString robotAddress ();
 
     /**
      * Returns the current control mode of the robot
      */
-    Q_INVOKABLE DS_ControlMode controlMode();
+    Q_INVOKABLE DS_ControlMode controlMode ();
 
     /**
      * Returns \c true if the robot reports that the user code is loaded
      */
-    Q_INVOKABLE bool robotHasCode();
+    Q_INVOKABLE bool robotHasCode ();
 
     /**
      * Returns \c true if the DS is connected to the robot
      */
-    Q_INVOKABLE bool networkAvailable();
+    Q_INVOKABLE bool networkAvailable ();
 
 public slots:
     /**
      * Initializes the class and the interlal loop/refresh system
      */
-    Q_INVOKABLE void init();
+    Q_INVOKABLE void init ();
 
     /**
      * Reboots the robot using the specified protocol
      */
-    Q_INVOKABLE void reboot();
+    Q_INVOKABLE void reboot ();
 
     /**
      * Restarts the robot code using the specified protocol
      */
-    Q_INVOKABLE void restartCode();
+    Q_INVOKABLE void restartCode ();
 
     /**
      * Simulates a timed match with the input time values (in seconds)
@@ -169,7 +169,7 @@ public slots:
     /**
      * Changes the protocol that we use to control the robot
      */
-    Q_INVOKABLE void setProtocol (DS_Protocol* protocol);
+    Q_INVOKABLE void setProtocol (DS_ProtocolBase* protocol);
 
     /**
      * Changes the protocol that we use to control the robot
@@ -219,7 +219,7 @@ public slots:
     /**
      * Un-registers all the joysticks from the Driver Station
      */
-    Q_INVOKABLE void clearJoysticks();
+    Q_INVOKABLE void clearJoysticks ();
 
     /**
      * Updates the \a angle of the selected \a hat in the specified \a josytick
@@ -247,61 +247,61 @@ signals:
      * Emitted when the client detects that the availability of the robot
      * software/code has changed
      */
-    void codeChanged (bool);
+    void codeChanged (bool available);
 
     /**
      * Emitted when the library detects that the CPU usage of the robot has
      * changed
      */
-    void cpuUsageChanged (int);
+    void cpuUsageChanged (int percent);
 
     /**
      * Emitted when the client detects that the availability of the robot
      * has changed (eg. when the robot is powered off with the breaker)
      */
-    void communicationsChanged (bool);
+    void communicationsChanged (bool available);
 
     /**
      * Emitted when the client detects that the availability of the robot radio
      * has changed (eg. when the robot is powered off with the breaker)
      */
-    void radioChanged (bool);
+    void radioChanged (bool available);
 
     /**
      * Emitted when the client analyzes a packet from the robot and extracts
      * the battery voltage of the robot.
      */
-    void voltageChanged (QString);
+    void voltageChanged (QString voltage);
 
     /**
      * Emitted when the NetConsole receives and decodes a message from the
      * robot
      */
-    void newMessage (QString);
+    void newMessage (QString message);
 
     /**
      * Emitted when the client has just connected to the robot and downloaded
      * its library INI files and analyzed them
      */
-    void libVersionChanged (QString);
+    void libVersionChanged (QString version);
 
     /**
      * Emitted when the client has just connected to the robot and downloaded
      * its PCM INI files and analyzed them
      */
-    void rioVersionChanged (QString);
+    void rioVersionChanged (QString version);
 
     /**
      * Emitted when the client has just connected to the robot and downloaded
      * its PDP information and analyzed them
      */
-    void pdpVersionChanged (QString);
+    void pdpVersionChanged (QString version);
 
     /**
      * Emitted when the client has just connected to the robot and downloaded
      * the PCM information files and analyzed them
      */
-    void pcmVersionChanged (QString);
+    void pcmVersionChanged (QString version);
 
     /**
      * Emitted when one of the following happens:
@@ -309,33 +309,33 @@ signals:
      *     - The communication status changes
      *     - The control mode of the robot is changed
      */
-    void robotStatusChanged (QString);
+    void robotStatusChanged (QString status);
 
     /**
      * Emitted when the control mode is changed
      */
-    void controlModeChanged (DS_ControlMode);
+    void controlModeChanged (DS_ControlMode mode);
 
     /**
      * Emitted when the libary detects that the RAM usage of the robot has
      * changed since the last update.
      */
-    void ramUsageChanged (int);
+    void ramUsageChanged (int usage);
 
     /**
      * Emitted when the libary detects that the disk usage of the robot has
      * changed since the last update.
      */
-    void diskUsageChanged (int);
+    void diskUsageChanged (int usage);
 
     /**
      * Emitted when the robot is enabled and the elapsed time
      * has been updated by the library.
      */
-    void elapsedTimeChanged (QString);
+    void elapsedTimeChanged (QString time);
 
 protected:
-    static DriverStation* m_instance;
+    static DriverStation* s_instance;
 
 private:
     /**
@@ -367,6 +367,11 @@ private:
     DS_ProtocolManager* m_manager;
 
     /**
+     * Represents the current protocol in operation
+     */
+    DS_ProtocolBase* m_protocol;
+
+    /**
      * Counts the elapsed time since the robot was
      * enabled. When the robot is disabled, the elapsed
      * time is stopped (just as in the official Driver Station)
@@ -377,14 +382,14 @@ private slots:
     /**
      * @brief sendRobotPackets
      */
-    void sendRobotPackets();
+    void sendRobotPackets ();
 
     /**
      * @internal
      * Resets the internal values of the library when we disconnect from the
      * robot.
      */
-    void resetInternalValues();
+    void resetInternalValues ();
 
     /**
      * @internal
@@ -399,7 +404,7 @@ private slots:
      *     - The robot code status has changed
      *     - The control mode of the robot has changed
      */
-    QString getStatus();
+    QString getStatus ();
 
     /**
      * @internal

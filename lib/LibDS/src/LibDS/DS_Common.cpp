@@ -22,11 +22,9 @@
 
 #include "LibDS/DS_Common.h"
 
-#include <QDateTime>
-
-QString DS_GetTimezoneCode()
+QString DS_GetTimezoneCode ()
 {
-    switch (QDateTime::currentDateTime().offsetFromUtc() / 3600) {
+    switch (QDateTime::currentDateTime ().offsetFromUtc () / 3600) {
     case -11:
         return "BST11BDT";
         break;
@@ -108,7 +106,7 @@ QString DS_GetStaticIp (int team, int host)
 {
     QString string = QString ("%1").arg (team);
 
-    switch (string.length()) {
+    switch (string.length ()) {
     case 1:
         string = "00.0" + string;
         break;
@@ -147,7 +145,7 @@ QString DS_GetControlModeString (DS_ControlMode mode)
         return QString ("Autonomous");
         break;
     case DS_ControlEmergencyStop:
-        return QString ("Emergency Stop");
+        return QString ("Emergency Stopped");
         break;
     case DS_ControlNoCommunication:
         return QString ("No Robot Communication");
@@ -155,4 +153,16 @@ QString DS_GetControlModeString (DS_ControlMode mode)
     }
 
     return QString ("");
+}
+
+QByteArray DS_GetSocketData (QUdpSocket* socket)
+{
+    QByteArray data;
+
+    while (socket->hasPendingDatagrams ()) {
+        data.resize (socket->pendingDatagramSize ());
+        socket->readDatagram (data.data (), data.size ());
+    }
+
+    return data;
 }

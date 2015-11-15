@@ -24,8 +24,8 @@
 #ifndef _LIB_DS_WATCHDOG_H
 #define _LIB_DS_WATCHDOG_H
 
+#include <QTimer>
 #include "DS_Global.h"
-class QTimer;
 
 /**
  * \class DS_Watchdog
@@ -46,8 +46,7 @@ class LIB_DS_DECL DS_Watchdog : public QObject
     Q_OBJECT
 
 public:
-    explicit DS_Watchdog();
-    ~DS_Watchdog();
+    explicit DS_Watchdog ();
 
 public slots:
     /**
@@ -57,7 +56,7 @@ public slots:
      *
      * Think of this as "kicking the dog".
      */
-    void restart();
+    void restart ();
 
 signals:
     /**
@@ -66,13 +65,13 @@ signals:
      * operation or to initiate corrective action in the case you
      * receive this signal
      */
-    void timeout();
+    void timeout ();
 
 private:
     /**
      * The timer that regulates the behavior of the class
      */
-    QTimer* m_timer;
+    QTimer m_timer;
 };
 
 #endif

@@ -27,16 +27,11 @@ import Material.ListItems 0.1 as ListItem
 Item {
     View {
         id: view
-        elevation: 1
 
         anchors {
-            left: parent.left
-            right: parent.right
+            fill: parent
             margins: Units.dp (32)
-            verticalCenter: parent.verticalCenter
         }
-
-        height: column.implicitHeight + Units.dp (32)
 
         Column {
             id: column

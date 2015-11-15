@@ -37,24 +37,19 @@ Item {
     Connections {
         target: c_ds
         onCommunicationsChanged: reset()
-        onRamUsageChanged: ramUsage.subText = qsTr ("%1%").arg (data)
-        onCpuUsageChanged: cpuUsage.subText = qsTr ("%1%").arg (data)
-        onDiskUsageChanged: diskUsage.subText = qsTr ("%1%").arg (data)
-        onVoltageChanged: batteryVoltage.subText = qsTr ("%1 V").arg (data)
+        onRamUsageChanged: ramUsage.subText = qsTr ("%1%").arg (percent)
+        onCpuUsageChanged: cpuUsage.subText = qsTr ("%1%").arg (percent)
+        onDiskUsageChanged: diskUsage.subText = qsTr ("%1%").arg (percent)
+        onVoltageChanged: batteryVoltage.subText = qsTr ("%1 V").arg (voltage)
     }
 
     View {
         id: view
-        elevation: 1
 
         anchors {
-            left: parent.left
-            right: parent.right
+            fill: parent
             margins: Units.dp (32)
-            verticalCenter: parent.verticalCenter
         }
-
-        height: column.implicitHeight + Units.dp (32)
 
         Column {
             id: column

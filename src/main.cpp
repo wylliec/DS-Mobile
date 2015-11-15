@@ -27,22 +27,30 @@
 #include <DriverStation.h>
 #include <QQmlApplicationEngine>
 
+#include "Updater.h"
 #include "Settings.h"
 
 int main (int argc, char* argv[])
 {
     QApplication app (argc, argv);
+    app.setApplicationVersion ("0.13");
     app.setOrganizationName ("WinT 3794");
     app.setApplicationName  ("QDriverStation Mobile");
 
-    Settings* st = new Settings();
+    Updater updater;
+    Settings settings;
     DriverStation* ds = DriverStation::getInstance();
+    ds->setProtocol (DriverStation::Protocol2015);
 
     QQmlApplicationEngine engine;
-    engine.addImportPath ("qrc:/Material/modules/");
     engine.rootContext()->setContextProperty ("c_ds", ds);
-    engine.rootContext()->setContextProperty ("c_settings", st);
+    engine.rootContext()->setContextProperty ("c_updater", &updater);
+    engine.rootContext()->setContextProperty ("c_settings", &settings);
+
+    engine.addImportPath ("qrc:/Material/modules/");
     engine.load (QUrl (QStringLiteral ("qrc:/qml/main.qml")));
+
+    updater.checkForUpdates();
 
     return app.exec();
 }

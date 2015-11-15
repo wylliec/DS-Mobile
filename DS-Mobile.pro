@@ -88,9 +88,12 @@ include ($$PWD/lib/Material/Material.pri)
 #-------------------------------------------------------------------------------
 
 SOURCES += $$PWD/src/main.cpp \
-           $$PWD/src/Settings.cpp
+           $$PWD/src/Settings.cpp \
+           $$PWD/src/Updater.cpp
 		   
-HEADERS += $$PWD/src/Settings.h
+HEADERS += $$PWD/src/Settings.h \
+           $$PWD/src/Updater.h
+
 RESOURCES += $$PWD/qml/qml.qrc
 
 #-------------------------------------------------------------------------------

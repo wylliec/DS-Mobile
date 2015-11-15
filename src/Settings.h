@@ -20,6 +20,10 @@
  * THE SOFTWARE.
  */
 
+#pragma once
+#ifndef _DS_MOBILE_SETTINGS_H
+#define _DS_MOBILE_SETTINGS_H
+
 #include <QObject>
 #include <QSettings>
 #include <QApplication>
@@ -75,3 +79,5 @@ public slots:
 private:
     QSettings* m_settings;
 };
+
+#endif

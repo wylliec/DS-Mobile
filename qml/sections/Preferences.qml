@@ -30,16 +30,11 @@ import "../interfaces"
 Item {
     View {
         id: view
-        elevation: 1
 
         anchors {
-            left: parent.left
-            right: parent.right
+            fill: parent
             margins: Units.dp (32)
-            verticalCenter: parent.verticalCenter
         }
-
-        height: column.implicitHeight + Units.dp (32)
 
         Column {
             id: column
@@ -88,6 +83,7 @@ Item {
 
                 Button {
                     id: reset
+                    elevation: 1
                     text: qsTr ("Reset")
                     onClicked: resetDialog.show()
                     anchors.right: parent.right

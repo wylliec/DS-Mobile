@@ -61,6 +61,19 @@ ApplicationWindow {
     property var sectionTitles: [ qsTr ("General"), qsTr ("Robot Information") ]
 
     /*
+     * Show an update message box when an update is available
+     */
+    Connections {
+        target: c_updater
+        onUpdateAvailable: {
+            updateAvailable.version = version
+            updateAvailable.downloadLink = downloadLink
+            updateAvailable.updateText()
+            updateAvailable.show()
+        }
+    }
+
+    /*
      * The main page
      */
     initialPage: TabbedPage {
@@ -114,23 +127,26 @@ ApplicationWindow {
         }
 
         /*
-         * Create a selectable item for each section
+         * Loader for the 'wide screen' version
          */
         Repeater {
             model: !navDrawer.enabled ? sections : 0
             delegate: Tab {
                 title: sectionTitles [index]
-                sourceComponent: tabDelegate
+                sourceComponent: !navDrawer.enabled ? tabDelegate : undefined
 
                 property var section: modelData
                 property string selectedComponent: modelData[0]
             }
         }
 
+        /*
+         * Loader for the 'small screen' version
+         */
         Loader {
             anchors.fill: parent
             visible: navDrawer.enabled
-            sourceComponent: tabDelegate
+            sourceComponent: navDrawer.enabled ? tabDelegate : undefined
 
             property var section: []
         }
@@ -190,6 +206,25 @@ ApplicationWindow {
             Scrollbar {
                 flickableItem: flickable
             }
+        }
+    }
+
+    /*
+     * The update available dialog
+     */
+    Dialog {
+        id: updateAvailable
+        title: qsTr ("Update Available")
+        positiveButtonText: qsTr ("Download")
+        onAccepted: Qt.openUrlExternally (downloadLink)
+
+        property string version
+        property string downloadLink
+
+        function updateText() {
+            text =  (qsTr ("A new version of %1 has been released!").arg ("QDriverStation")
+                     + "<br/><br/>"
+                     + qsTr ("Version %1 is now available to download.").arg ("<b>" + version + "</b>"))
         }
     }
 

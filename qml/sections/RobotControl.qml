@@ -27,9 +27,12 @@ import Material.ListItems 0.1 as ListItem
 import "../widgets"
 import "../interfaces"
 
-Item{
-
-    Component.onCompleted: controls.show()
+Item {
+    Component.onCompleted: {
+        c_ds.init()
+        controls.show()
+        Settings.loadSettings()
+    }
 
     function enableRobot() {
         button.checked = true
@@ -38,16 +41,16 @@ Item{
         {
         case 0:
             controls.hide()
-            c_ds.setControlMode (c_ds.Teleoperated)
+            c_ds.setControlMode (1)
             break
         case 1:
-            c_ds.setControlMode (c_ds.Autonomous)
+            c_ds.setControlMode (2)
             break
         case 2:
-            c_ds.setControlMode (c_ds.Test)
+            c_ds.setControlMode (3)
             break
         case 3:
-            c_ds.setControlMode (c_ds.EmergencyStop)
+            c_ds.setControlMode (4)
             break
         default:
             disableRobot()
@@ -58,13 +61,13 @@ Item{
     function disableRobot() {
         controls.show()
         button.checked = false
-        c_ds.setControlMode (c_ds.Disabled)
+        c_ds.setControlMode (0)
     }
 
     Connections {
         target: c_ds
-        onCodeChanged: code.available = c_ds.robotHasCode()
-        onCommunicationsChanged: communications.available = c_ds.networkAvailable()
+        onCodeChanged: code.available = available
+        onCommunicationsChanged: communications.available = available
     }
 
     Snackbar {
@@ -99,7 +102,6 @@ Item{
                 height = column.implicitHeight + Units.dp (32)
             }
 
-            Behavior on height  {NumberAnimation{}}
             Behavior on opacity {NumberAnimation{}}
 
             Column {

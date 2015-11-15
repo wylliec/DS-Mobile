@@ -45,21 +45,18 @@ Object {
     property string accentColor: c_settings.get ("Accent color", "blueGrey")
     property string primaryColor: c_settings.get ("Primary color", "blueGrey")
 
+    /* Used to avoid loading settings more than one time */
+    property bool m_init: false
+
     /*
      * Applies saved settings
      */
-    Component.onCompleted: {
-        initDriverStation()
-        updateAppAppearance()
-        updateDriverStationConfig()
-    }
-
-    /*
-     * Initalizes and configures the Driver Station
-     */
-    function initDriverStation() {
-        c_ds.init()
-        c_ds.setProtocol (c_ds.Protocol2015)
+    function loadSettings() {
+        if (!m_init) {
+            m_init = true
+            updateAppAppearance()
+            updateDriverStationConfig()
+        }
     }
 
     /*
