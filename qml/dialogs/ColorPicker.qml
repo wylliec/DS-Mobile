@@ -68,7 +68,7 @@ Dialog {
                             Settings.setPrimaryColor (modelData)
                             break;
                         case 1:
-                            Settings.setAccentConolor (modelData)
+                            Settings.setAccentColor (modelData)
                             break;
                         }
                     }

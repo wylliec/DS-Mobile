@@ -25,23 +25,16 @@ import Material 0.1
 import Material.ListItems 0.1 as ListItem
 
 Item {
-    View {
-        id: view
+    Column {
+        id: column
+        anchors.fill: parent
+        anchors.margins: Units.dp (20)
 
-        anchors {
-            fill: parent
-            margins: Units.dp (32)
+        Label {
+            style: "body2"
+            text:  "Robot Diagnostics"
         }
 
-        Column {
-            id: column
-            anchors.fill: parent
-            anchors.margins: Units.dp (16)
-
-            Label {
-                style: "body2"
-                text:  "Robot Diagnostics"
-            } ListItem.Divider {}
-        }
+        ListItem.Divider {}
     }
 }

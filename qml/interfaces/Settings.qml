@@ -42,11 +42,13 @@ Object {
     property int height: c_settings.getNumber ("height", Units.dp (600))
 
     /* Theming stuff */
-    property string accentColor: c_settings.get ("Accent color", "blueGrey")
-    property string primaryColor: c_settings.get ("Primary color", "blueGrey")
+    property string accentColor: c_settings.get ("Accent", "blueGrey")
+    property string primaryColor: c_settings.get ("Primary", "blueGrey")
 
     /* Used to avoid loading settings more than one time */
     property bool m_init: false
+
+    Component.onCompleted: updateAppAppearance()
 
     /*
      * Applies saved settings
@@ -54,8 +56,9 @@ Object {
     function loadSettings() {
         if (!m_init) {
             m_init = true
-            updateAppAppearance()
             updateDriverStationConfig()
+
+            Window.showMaximized()
         }
     }
 
@@ -63,9 +66,10 @@ Object {
      * Re-configures the DS with current settings
      */
     function updateDriverStationConfig() {
-        updateAlliance()
+        c_ds.init()
         c_ds.setTeamNumber (teamNumber)
         c_ds.setCustomAddress (robotAddress)
+        updateAlliance()
     }
 
     /*
@@ -156,10 +160,10 @@ Object {
     /*
      * Saves the accent color and updates the app
      */
-    function setAccentConolor (color) {
+    function setAccentColor (color) {
         accentColor = color
         updateAppAppearance()
-        c_settings.set ("Accent Color", accentColor)
+        c_settings.set ("Accent", color)
     }
 
     /*
@@ -168,7 +172,7 @@ Object {
     function setPrimaryColor (color) {
         primaryColor = color
         updateAppAppearance()
-        c_settings.set ("Primary Color", primaryColor)
+        c_settings.set ("Primary", color)
     }
 
     /*

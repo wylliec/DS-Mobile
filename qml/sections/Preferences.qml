@@ -28,67 +28,53 @@ import "../dialogs"
 import "../interfaces"
 
 Item {
-    View {
-        id: view
 
-        anchors {
-            fill: parent
-            margins: Units.dp (32)
+    Column {
+        id: column
+        anchors.fill: parent
+        anchors.margins: Units.dp (20)
+
+        Label {
+            style: "body2"
+            text:  "Networking Settings"
+        } ListItem.Divider {}
+
+        ListItem.Subtitled {
+            subText: robotAddress.value
+            text: qsTr ("Robot Address")
+            onClicked: robotAddress.show()
+            iconName: "device/network_wifi"
         }
 
-        Column {
-            id: column
-            anchors.fill: parent
-            anchors.margins: Units.dp (16)
+        ListItem.Subtitled {
+            iconName: "content/flag"
+            subText: teamNumber.value
+            text: qsTr ("Team number")
+            onClicked: teamNumber.show()
+        }
 
-            Label {
-                style: "body2"
-                text:  "Networking Settings"
-            } ListItem.Divider {}
+        Label {
+            style: "body2"
+            text:  "Other options"
+        } ListItem.Divider {}
 
-            ListItem.Subtitled {
-                subText: robotAddress.value
-                text: qsTr ("Robot Address")
-                onClicked: robotAddress.show()
-                iconName: "device/network_wifi"
-            }
+        ListItem.Subtitled {
+            iconName: "image/color_lens"
+            onClicked: colorPicker.show()
+            text: qsTr ("Change Appearance")
+        }
 
-            ListItem.Subtitled {
-                iconName: "content/flag"
-                subText: teamNumber.value
-                text: qsTr ("Team number")
-                onClicked: teamNumber.show()
-            }
+        Item {
+            width: Units.dp (20)
+            height: Units.dp (20)
+        }
 
-            Label {
-                style: "body2"
-                text:  "Other options"
-            } ListItem.Divider {}
-
-            ListItem.Subtitled {
-                iconName: "image/color_lens"
-                onClicked: colorPicker.show()
-                text: qsTr ("Change Appearance")
-            }
-
-            Item {
-                height: reset.height
-                anchors.left: parent.left
-                anchors.right: parent.right
-
-                Item {
-                    anchors.left: parent.left
-                    anchors.right: reset.left
-                }
-
-                Button {
-                    id: reset
-                    elevation: 1
-                    text: qsTr ("Reset")
-                    onClicked: resetDialog.show()
-                    anchors.right: parent.right
-                }
-            }
+        Button {
+            id: reset
+            elevation: 1
+            text: qsTr ("Reset")
+            onClicked: resetDialog.show()
+            anchors.horizontalCenter: parent.horizontalCenter
         }
     }
 

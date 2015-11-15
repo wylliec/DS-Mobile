@@ -42,7 +42,7 @@ Item {
             top: parent.top
             left: parent.left
             right: parent.right
-            margins: Units.dp (32)
+            margins: Units.dp (20)
         }
 
         Label {
@@ -61,8 +61,7 @@ Item {
             left: parent.left
             right: parent.right
             bottom: buttons.top
-            margins: Units.dp (32)
-            topMargin: Units.dp (8)
+            margins: Units.dp (4)
         }
 
         Label {

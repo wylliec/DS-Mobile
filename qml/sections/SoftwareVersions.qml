@@ -41,50 +41,34 @@ Item {
         onPcmVersionChanged: pcm.subText = version
     }
 
-    View {
-        id: view
+    Column {
+        id: column
+        anchors.fill: parent
+        anchors.margins: Units.dp (20)
 
-        anchors {
-            fill: parent
-            margins: Units.dp (32)
+        Label {
+            style: "body2"
+            text:  "Software Versions"
         }
 
-        Column {
-            id: column
-            anchors.fill: parent
-            anchors.margins: Units.dp (16)
+        ListItem.Divider {}
 
-            Label {
-                style: "body2"
-                text:  "Software Versions"
-            } ListItem.Divider {}
+        ListItem.Subtitled {
+            id: lib
+            iconName: "action/code"
+            text: qsTr ("FRC Library")
+        }
 
-            /*
-             * Library Version
-             */
-            ListItem.Subtitled {
-                id: lib
-                iconName: "action/code"
-                text: qsTr ("FRC Library")
-            }
+        ListItem.Subtitled {
+            id: pdp
+            iconName: "action/power_settings_new"
+            text: qsTr ("Power Distribution Panel")
+        }
 
-            /*
-             * PDP Version
-             */
-            ListItem.Subtitled {
-                id: pdp
-                iconName: "action/power_settings_new"
-                text: qsTr ("Power Distribution Panel")
-            }
-
-            /*
-             * PCM Version
-             */
-            ListItem.Subtitled {
-                id: pcm
-                iconName: "hardware/memory"
-                text: qsTr ("Pneumatic Control Module")
-            }
+        ListItem.Subtitled {
+            id: pcm
+            iconName: "hardware/memory"
+            text: qsTr ("Pneumatic Control Module")
         }
     }
 }

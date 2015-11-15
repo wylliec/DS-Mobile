@@ -43,59 +43,40 @@ Item {
         onVoltageChanged: batteryVoltage.subText = qsTr ("%1 V").arg (voltage)
     }
 
-    View {
-        id: view
+    Column {
+        id: column
+        anchors.fill: parent
+        anchors.margins: Units.dp (20)
 
-        anchors {
-            fill: parent
-            margins: Units.dp (32)
+        Label {
+            style: "body2"
+            text:  "System Monitor"
         }
 
-        Column {
-            id: column
-            anchors.fill: parent
-            anchors.margins: Units.dp (16)
+        ListItem.Divider {}
 
-            Label {
-                style: "body2"
-                text:  "System Monitor"
-            } ListItem.Divider {}
+        ListItem.Subtitled {
+            id: batteryVoltage
+            iconName: "device/battery_std"
+            text: qsTr ("Battery Voltage")
+        }
 
-            /*
-             * Battery Voltage
-             */
-            ListItem.Subtitled {
-                id: batteryVoltage
-                iconName: "device/battery_std"
-                text: qsTr ("Battery Voltage")
-            }
+        ListItem.Subtitled {
+            id: ramUsage
+            iconName: "hardware/memory"
+            text: qsTr ("RAM Usage")
+        }
 
-            /*
-             * RAM Usage
-             */
-            ListItem.Subtitled {
-                id: ramUsage
-                iconName: "hardware/memory"
-                text: qsTr ("RAM Usage")
-            }
+        ListItem.Subtitled {
+            id: cpuUsage
+            iconName: "action/settings"
+            text: qsTr ("CPU Usage")
+        }
 
-            /*
-             * CPU Usage
-             */
-            ListItem.Subtitled {
-                id: cpuUsage
-                iconName: "action/settings"
-                text: qsTr ("CPU Usage")
-            }
-
-            /*
-             * Disk usage
-             */
-            ListItem.Subtitled {
-                id: diskUsage
-                iconName: "device/storage"
-                text: qsTr ("Disk Usage")
-            }
+        ListItem.Subtitled {
+            id: diskUsage
+            iconName: "device/storage"
+            text: qsTr ("Disk Usage")
         }
     }
 }

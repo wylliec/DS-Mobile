@@ -30,10 +30,7 @@ import "interfaces"
 ApplicationWindow {
     id: app
     visible: true
-    Component.onCompleted: {
-        Units.gridUnit = Units.dp (56)
-        showMaximized()
-    }
+    Component.onCompleted: Units.gridUnit = Units.dp (56)
 
     /*
      * Sections of the general tab
