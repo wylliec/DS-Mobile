@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/WinT-3794/DS-Mobile.svg?branch=master)](https://travis-ci.org/WinT-3794/DS-Mobile)
 [![BitCoin donate button](https://img.shields.io/badge/bitcoin-donate-yellow.svg)](https://blockchain.info/address/1K85yLxjuqUmhkjP839R7C23XFhSxrefMx "Donate once-off to this project using BitCoin")
 
-[![Screenshot](/etc/screenshots/Main.jpg)](etc/screenshots/)
+[![Screenshot](/etc/screenshots/Main_small.jpg)](etc/screenshots/)
 
 ### Introduction
 
