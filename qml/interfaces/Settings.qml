@@ -57,8 +57,6 @@ Object {
         if (!m_init) {
             m_init = true
             updateDriverStationConfig()
-
-            Window.showMaximized()
         }
     }
 

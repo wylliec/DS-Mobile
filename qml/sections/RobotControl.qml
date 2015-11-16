@@ -94,7 +94,6 @@ Item {
             height = implicitHeight
         }
 
-        Behavior on height  {NumberAnimation{}}
         Behavior on opacity {NumberAnimation{}}
 
         Label {
