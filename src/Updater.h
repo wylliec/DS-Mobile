@@ -32,21 +32,20 @@
 
 #include "Settings.h"
 
-class Updater : public QObject
-{
+class Updater : public QObject {
     Q_OBJECT
 
-public:
+  public:
     explicit Updater();
 
-signals:
+  signals:
     void updateAvailable (QString version,
                           QString downloadLink);
 
-public slots:
+  public slots:
     Q_INVOKABLE void checkForUpdates();
 
-private slots:
+  private slots:
     void showUpdateMessages();
     void onFinished (QNetworkReply* reply);
     void readDownloadLink (QByteArray data);
@@ -54,7 +53,7 @@ private slots:
 
     QString readKey (QString data, QString key);
 
-private:
+  private:
     bool m_updateAvailable;
 
     QString m_version;

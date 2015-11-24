@@ -30,6 +30,7 @@ QT += qml
 QT += core
 QT += network
 QT += widgets
+QT += multimedia
 
 CONFIG += c++11
 
@@ -40,28 +41,32 @@ CONFIG += c++11
 INCLUDEPATH += $$PWD/include
 
 HEADERS += \
-    $$PWD/include/LibDS/DS_Client.h \
-    $$PWD/include/LibDS/DS_Common.h \
-    $$PWD/include/LibDS/DS_ElapsedTime.h \
-    $$PWD/include/LibDS/DS_Global.h \
-    $$PWD/include/LibDS/DS_NetConsole.h \
-    $$PWD/include/LibDS/DS_ProtocolManager.h \
-    $$PWD/include/LibDS/DS_Timers.h \
-    $$PWD/include/LibDS/DS_Watchdog.h \
-    $$PWD/include/Protocols/DS_Protocol2015.h \
-    $$PWD/include/DriverStation.h \
-    $$PWD/include/Extra/Discovery.h \
-    $$PWD/include/LibDS/DS_ProtocolBase.h
+    $$PWD/include/LibDS/DriverStation.h \
+    $$PWD/include/LibDS/Protocols/Protocol2015.h \
+    $$PWD/include/LibDS/Core/Client.h \
+    $$PWD/include/LibDS/Core/Common.h \
+    $$PWD/include/LibDS/Core/ElapsedTimer.h \
+    $$PWD/include/LibDS/Core/Library.h \
+    $$PWD/include/LibDS/Core/NetConsole.h \
+    $$PWD/include/LibDS/Core/ProtocolBase.h \
+    $$PWD/include/LibDS/Core/ProtocolManager.h \
+    $$PWD/include/LibDS/Core/Timers.h \
+    $$PWD/include/LibDS/Core/Watchdog.h \
+    $$PWD/include/LibDS/Core/Discovery/Discovery.h \
+    $$PWD/include/LibDS/Core/Discovery/MDNS.h
 
 SOURCES += \
-    $$PWD/src/LibDS/DS_Client.cpp \
-    $$PWD/src/LibDS/DS_Common.cpp \
-    $$PWD/src/LibDS/DS_ElapsedTime.cpp \
-    $$PWD/src/LibDS/DS_NetConsole.cpp \
-    $$PWD/src/LibDS/DS_ProtocolManager.cpp \
-    $$PWD/src/LibDS/DS_Timers.cpp \
-    $$PWD/src/LibDS/DS_Watchdog.cpp \
-    $$PWD/src/Protocols/DS_Protocol2015.cpp \
     $$PWD/src/DriverStation.cpp \
-    $$PWD/src/Extra/Discovery.cpp \
-    $$PWD/src/LibDS/DS_ProtocolBase.cpp
+    $$PWD/src/Core/Client.cpp \
+    $$PWD/src/Core/Common.cpp \
+    $$PWD/src/Core/ElapsedTimer.cpp \
+    $$PWD/src/Core/NetConsole.cpp \
+    $$PWD/src/Core/ProtocolBase.cpp \
+    $$PWD/src/Core/ProtocolManager.cpp \
+    $$PWD/src/Core/Timers.cpp \
+    $$PWD/src/Core/Watchdog.cpp \
+    $$PWD/src/Core/Discovery/Discovery.cpp \
+    $$PWD/src/Protocols/Protocol2015.cpp \
+    $$PWD/src/Core/Discovery/MDNS.cpp
+
+RESOURCES += $$PWD/sounds/libds-sounds.qrc

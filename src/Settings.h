@@ -28,15 +28,14 @@
 #include <QSettings>
 #include <QApplication>
 
-class Settings : public QObject
-{
+class Settings : public QObject {
     Q_OBJECT
 
-public:
+  public:
     explicit Settings();
     ~Settings();
 
-public slots:
+  public slots:
     /**
      * Saves the \a value to the input \a key
      */
@@ -76,7 +75,7 @@ public slots:
      */
     Q_INVOKABLE QString getString (QString key, QString defValue);
 
-private:
+  private:
     QSettings* m_settings;
 };
 

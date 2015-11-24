@@ -22,38 +22,31 @@
 
 #include "Settings.h"
 
-Settings::Settings()
-{
+Settings::Settings() {
     m_settings = new QSettings (qApp->organizationName(),
                                 qApp->applicationName());
 }
 
-Settings::~Settings()
-{
+Settings::~Settings() {
     delete m_settings;
 }
 
-void Settings::set (QString key, QVariant value)
-{
+void Settings::set (QString key, QVariant value) {
     m_settings->setValue (key, value);
 }
 
-QVariant Settings::get (QString key, QVariant defValue)
-{
+QVariant Settings::get (QString key, QVariant defValue) {
     return m_settings->value (key, defValue);
 }
 
-bool Settings::getBool (QString key, QString defValue)
-{
+bool Settings::getBool (QString key, QString defValue) {
     return get (key, defValue).toBool();
 }
 
-double Settings::getNumber (QString key, double defValue)
-{
+double Settings::getNumber (QString key, double defValue) {
     return get (key, defValue).toDouble();
 }
 
-QString Settings::getString (QString key, QString defValue)
-{
+QString Settings::getString (QString key, QString defValue) {
     return get (key, defValue).toString();
 }

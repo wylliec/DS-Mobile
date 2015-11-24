@@ -40,16 +40,16 @@ Item {
         {
         case 0:
             controls.hide()
-            c_ds.setControlMode (1)
+            c_ds.startTeleoperated()
             break
         case 1:
-            c_ds.setControlMode (2)
+            c_ds.startAutonomous()
             break
         case 2:
-            c_ds.setControlMode (3)
+            c_ds.startTest()
             break
         case 3:
-            c_ds.setControlMode (4)
+            c_ds.startEmergencyStop()
             break
         default:
             disableRobot()
@@ -60,7 +60,7 @@ Item {
     function disableRobot() {
         controls.show()
         button.checked = false
-        c_ds.setControlMode (0)
+        c_ds.startDisabled()
     }
 
     Connections {

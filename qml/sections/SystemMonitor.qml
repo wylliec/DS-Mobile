@@ -40,7 +40,7 @@ Item {
         onRamUsageChanged: ramUsage.subText = qsTr ("%1%").arg (percent)
         onCpuUsageChanged: cpuUsage.subText = qsTr ("%1%").arg (percent)
         onDiskUsageChanged: diskUsage.subText = qsTr ("%1%").arg (percent)
-        onVoltageChanged: batteryVoltage.subText = qsTr ("%1 V").arg (voltage)
+        onVoltageChanged: batteryVoltage.subText = qsTr ("%1 Volts").arg (voltage)
     }
 
     Column {

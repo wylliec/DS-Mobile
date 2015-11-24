@@ -24,23 +24,23 @@
 #include <QClipboard>
 #include <QQmlContext>
 #include <QApplication>
-#include <DriverStation.h>
 #include <QQmlApplicationEngine>
+
+#include <LibDS/DriverStation.h>
 
 #include "Updater.h"
 #include "Settings.h"
 
-int main (int argc, char* argv[])
-{
+int main (int argc, char* argv[]) {
     QApplication app (argc, argv);
-    app.setApplicationVersion ("0.13");
+    app.setApplicationVersion ("0.14");
     app.setOrganizationName ("WinT 3794");
     app.setApplicationName  ("QDriverStation Mobile");
 
     Updater updater;
     Settings settings;
     DriverStation* ds = DriverStation::getInstance();
-    ds->setProtocol (DriverStation::Protocol2015);
+    ds->setProtocol (DriverStation::kProtocol2015);
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty ("c_ds", ds);

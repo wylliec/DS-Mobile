@@ -22,8 +22,7 @@
 
 #include "Updater.h"
 
-Updater::Updater()
-{
+Updater::Updater() {
     m_version = "";
     m_platform = "";
     m_downloadLink = "";
@@ -45,16 +44,14 @@ Updater::Updater()
              this,             SLOT   (onFinished (QNetworkReply*)));
 }
 
-void Updater::checkForUpdates()
-{
+void Updater::checkForUpdates() {
     QString url = "https://raw.githubusercontent.com/"
                   "WinT-3794/QDriverStation/updater/current";
 
     m_accessManager.get (QNetworkRequest (QUrl (url)));
 }
 
-void Updater::showUpdateMessages()
-{
+void Updater::showUpdateMessages() {
     bool alreadyShown = m_settings.get (m_version, false).toBool();
 
     if (m_updateAvailable && !alreadyShown) {
@@ -63,8 +60,7 @@ void Updater::showUpdateMessages()
     }
 }
 
-void Updater::onFinished (QNetworkReply* reply)
-{
+void Updater::onFinished (QNetworkReply* reply) {
     QByteArray data = reply->readAll();
 
     readDownloadLink (data);
@@ -74,14 +70,12 @@ void Updater::onFinished (QNetworkReply* reply)
     delete reply;
 }
 
-void Updater::readDownloadLink (QByteArray data)
-{
+void Updater::readDownloadLink (QByteArray data) {
     m_downloadLink = readKey (QString::fromUtf8 (data),
                               QString ("download-%1").arg (m_platform));
 }
 
-void Updater::readApplicationVersion (QByteArray data)
-{
+void Updater::readApplicationVersion (QByteArray data) {
     m_updateAvailable = false;
     m_version = readKey (QString::fromUtf8 (data),
                          QString ("latest-%1").arg (m_platform));
@@ -110,8 +104,7 @@ void Updater::readApplicationVersion (QByteArray data)
     }
 }
 
-QString Updater::readKey (QString data, QString key)
-{
+QString Updater::readKey (QString data, QString key) {
     QString value;
     int startIndex = -1;
     int finishIndex = -1;
