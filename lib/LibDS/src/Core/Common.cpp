@@ -128,28 +128,27 @@ QString DS_GetStaticIp (int team, int host) {
 }
 
 QString DS_GetControlModeString (DS_ControlMode mode) {
+    QString string;
+
     switch (mode) {
     case kControlTest:
-        return QString ("Test");
+        string = "Test";
         break;
     case kControlTeleoperated:
-        return QString ("Teleoperated");
+        string = "Teleoperated";
         break;
     case kControlDisabled:
-        return QString ("Disabled");
+        string = "Disabled";
         break;
     case kControlAutonomous:
-        return QString ("Autonomous");
+        string = "Autonomous";
         break;
     case kControlEmergencyStop:
-        return QString ("Emergency Stopped");
-        break;
-    case kControlNoCommunication:
-        return QString ("No Robot Communication");
+        string = "Emergency Stopped";
         break;
     }
 
-    return QString ("");
+    return string;
 }
 
 QByteArray DS_GetSocketData (QUdpSocket* socket) {
@@ -161,4 +160,21 @@ QByteArray DS_GetSocketData (QUdpSocket* socket) {
     }
 
     return data;
+}
+
+void ShortToBytes::setData (int data) {
+    if (data == -1) {
+        byte1 = 0xFF;
+        byte2 = 0xFF;
+    }
+
+    else if (data <= 0xFF) {
+        byte1 = 0;
+        byte2 = data;
+    }
+
+    else if (data > 0xFF) {
+        byte1 = data / 0xFF;
+        byte2 = (data - ((byte1) * 0xFF)) - byte1;
+    }
 }

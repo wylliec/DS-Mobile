@@ -22,20 +22,19 @@
 
 #include "LibDS/Protocols/Protocol2015.h"
 
-#define d_PcmPath "/tmp/frc_versions/PCM-0-versions.ini"
-#define d_PdpPath "/tmp/frc_versions/PDP-0-versions.ini"
-#define d_LibPath "/tmp/frc_versions/FRC_Lib_Version.ini"
+const QString PCM_PATH = "/tmp/frc_versions/PCM-0-versions.ini";
+const QString PDP_PATH = "/tmp/frc_versions/PDP-0-versions.ini";
+const QString LIB_PATH = "/tmp/frc_versions/FRC_Lib_Version.ini";
 
 /**
  * The values used by the protocol to represent the different operation modes
  */
 enum ControlModes {
     pControlTest            = 0x05u, /**< Individual actuators can be moved */
-    pControlDisabled        = 0x01u, /**< Robot is idle */
+    pControlDisabled        = 0x00u, /**< Robot is idle */
     pControlAutonomous      = 0x06u, /**< Robot takes over the world */
     pControlTeleoperated    = 0x04u, /**< User moves the robot */
-    pControlEmmergencyStop  = 0x80u, /**< Forced robot stop */
-    pControlNoCommunication = 0x02u  /**< Trying to connect with robot... */
+    pControlEmergencyStop   = 0x80u, /**< Forced robot stop */
 };
 
 /**
@@ -49,9 +48,9 @@ enum Headers {
 };
 
 /**
- * 'Special' operation codes, we should dig more in this section...
+ * 'Special' operation codes that we send to robot
  */
-enum RobotStatus {
+enum RequestBytes {
     pStatusNormal           = 0x10u, /**< Normal operation */
     pStatusInvalid          = 0x00u, /**< No communication */
     pStatusRebootRio        = 0x18u, /**< Reboot the roboRIO */
@@ -62,12 +61,18 @@ enum RobotStatus {
  * Echo codes from the robot and (probably) software status
  */
 enum ProgramStatus {
-    pProgramTest            = 0x38u, /**< Control mode confirmation code */
-    pProgramNoCode          = 0x00u, /**< Not sure if this is correct */
-    pProgramDisabled        = 0x31u, /**< Control mode confirmation code */
-    pProgramAutonomous      = 0x30u, /**< Control mode confirmation code */
+    pProgramTest            = 0x08u, /**< Control mode confirmation code */
+    pProgramDisabled        = 0x01u, /**< Control mode confirmation code */
+    pProgramAutonomous      = 0x04u, /**< Control mode confirmation code */
+    pProgramCodePresent     = 0x20u, /**< Not sure if this is correct */
+    pProgramTeleoperated    = 0x02u  /**< Control mode confirmation code */
+};
+
+/**
+ * Operations that the robot wants us to perform
+ */
+enum RobotRequestBytes {
     pProgramRequestTime     = 0x01u, /**< Robot wants to get the date/time */
-    pProgramTeleoperated    = 0x32u  /**< Control mode confirmation code */
 };
 
 /**
@@ -97,6 +102,14 @@ int DS_Protocol2015::clientPort() {
     return 1150;
 }
 
+QString DS_Protocol2015::defaultRadioAddress() {
+    return DS_GetStaticIp (team(), 1);
+}
+
+QString DS_Protocol2015::defaultRobotAddress() {
+    return QString ("roboRIO-%1.local").arg (team());
+}
+
 void DS_Protocol2015::reboot() {
     updateStatus (pStatusRebootRio);
 }
@@ -111,39 +124,39 @@ void DS_Protocol2015::resetProtocol() {
 
 void DS_Protocol2015::downloadRobotInformation() {
     QString host = "FTP_://" + robotAddress();
-    m_manager.get (QNetworkRequest (host + d_LibPath));
-    m_manager.get (QNetworkRequest (host + d_PcmPath));
-    m_manager.get (QNetworkRequest (host + d_PdpPath));
+    m_manager.get (QNetworkRequest (host + LIB_PATH));
+    m_manager.get (QNetworkRequest (host + PCM_PATH));
+    m_manager.get (QNetworkRequest (host + PDP_PATH));
 }
 
 void DS_Protocol2015::readRobotData (QByteArray data) {
-    /* We just have connected to the robot */
+    /* Packet length is invalid */
+    if (data.length() < 8)
+        return;
+
+    /* We just have connected to the robot, update internal values */
     if (!isConnected()) {
         downloadRobotInformation();
-        updateCommunications (true);
+        updateCommunications (kFull);
         setControlMode (kControlDisabled);
-    }
 
-    /* Get robot program status */
-    else if (isConnected()) {
-        /* Reset status bit if needed */
         if (status() == pStatusInvalid)
             updateStatus (pStatusNormal);
-
-        /* Get robot code value */
-        bool code = (data.at (4) != pProgramNoCode);
-        if (robotCode() != code)
-            updateRobotCode (code);
-
-        /* Know if robot requests timezone to be sent */
-        updateSendDateTime (data.at (7) == pProgramRequestTime);
-
-        /* Reset the watchdog and update the DS */
-        emit packetReceived();
     }
 
-    /* Get robot voltage */
-    updateVoltage (data.at (6), data.at (7));
+    /* Read robot packet */
+    int status       = data.at (4);
+    int request      = data.at (7);
+    int majorVoltage = data.at (5);
+    int minorVoltage = data.at (6);
+
+    /* Update client information */
+    updateVoltage (majorVoltage, minorVoltage);
+    updateSendDateTime (request == pProgramRequestTime);
+    updateRobotCode ((status & pProgramCodePresent) != 0);
+
+    /* Reset watchdog */
+    emit packetReceived();
 }
 
 void DS_Protocol2015::onDownloadFinished (QNetworkReply* reply) {
@@ -153,7 +166,7 @@ void DS_Protocol2015::onDownloadFinished (QNetworkReply* reply) {
     if (data.isEmpty() || url.isEmpty())
         return;
 
-    else if (url.contains (d_PcmPath, Qt::CaseInsensitive)) {
+    else if (url.contains (PCM_PATH, Qt::CaseInsensitive)) {
         QString version;
         QString key = "currentVersion";
 
@@ -165,7 +178,7 @@ void DS_Protocol2015::onDownloadFinished (QNetworkReply* reply) {
         emit pcmVersionChanged (version);
     }
 
-    else if (url.contains (d_PdpPath, Qt::CaseInsensitive)) {
+    else if (url.contains (PDP_PATH, Qt::CaseInsensitive)) {
         QString version;
         QString key = "currentVersion";
 
@@ -177,46 +190,35 @@ void DS_Protocol2015::onDownloadFinished (QNetworkReply* reply) {
         emit pdpVersionChanged (version);
     }
 
-    else if (url.contains (d_LibPath, Qt::CaseInsensitive))
+    else if (url.contains (LIB_PATH, Qt::CaseInsensitive))
         emit libVersionChanged (data);
 
     delete reply;
-}
-
-QString DS_Protocol2015::defaultRadioAddress() {
-    return DS_GetStaticIp (team(), 1);
-}
-
-QString DS_Protocol2015::defaultRobotAddress() {
-    return QString ("roboRIO-%1.local").arg (team());
 }
 
 QByteArray DS_Protocol2015::generateClientPacket() {
     QByteArray data;
 
     /* Add packet index data */
-    data.append (sentPackets() / 0xFF);
-    data.append (sentPackets() - (sentPackets() / 0xFF));
+    ShortToBytes pingData;
+    pingData.setData (sentPackets());
+    data.append (pingData.byte1);
+    data.append (pingData.byte2);
 
     /* Add general header data, without it, we are worthless */
-    data.append (pHeaderGeneral);
+    data.append ((quint8) pHeaderGeneral);
 
     /* Add the current control mode (e.g TeleOp, Auto, etc) */
     data.append (getControlCode (controlMode()));
 
     /* Add the current robot status (e.g. normal, reboot, etc) */
-    data.append (isConnected() ? status() : pStatusInvalid);
+    data.append (isConnected() ? status() : (int) pStatusInvalid);
 
     /* Add the current alliance and position */
     data.append (getAllianceCode (alliance()));
 
-    /* Send joystick data if possible */
-    if (isConnected() && !sendDateTime())
-        data.append (generateJoystickData());
-
-    /* Robot wants to know what time is it */
-    else if (sendDateTime())
-        data.append (generateTimezoneData());
+    /* Send joystick data or timezone code */
+    data.append (sendDateTime() ? generateTimezoneData() : generateJoystickData());
 
     return data;
 }
@@ -224,42 +226,54 @@ QByteArray DS_Protocol2015::generateClientPacket() {
 QByteArray DS_Protocol2015::generateJoystickData() {
     QByteArray data;
 
+    /* Do not send JS data on DS init */
+    if (sentPackets() <= 5)
+        return data;
+
     /* Generate data for each joystick */
     for (int i = 0; i < joysticks()->count(); ++i) {
-        int numAxes = joysticks()->at (i)->numAxes;
+        int numAxes    = joysticks()->at (i)->numAxes;
         int numButtons = joysticks()->at (i)->numButtons;
         int numPovHats = joysticks()->at (i)->numPovHats;
 
         /* Add joystick information and put the section header */
-        data.append (getJoystickSize (joysticks()->at (i)) + 1);
-        data.append (pHeaderJoystick);
+        data.append (getJoystickSize (joysticks()->at (i)) - 1);
+        data.append ((quint8) pHeaderJoystick);
 
         /* Add axis data */
         if (numAxes > 0) {
             data.append (numAxes);
-            for (int axis = 0; axis < numAxes; ++axis)
-                data.append (joysticks()->at (i)->axes [axis] * 0x80);
+            for (int axis = 0; axis < numAxes; ++axis) {
+                double value = joysticks()->at (i)->axes [axis];
+                value *= value > 0 ? 128 : 127;
+                data.append ((char) value);
+            }
         }
 
         /* Add button data */
         if (numButtons > 0) {
-            QBitArray buttons (numButtons);
-            for (int button = 0; button < numButtons; ++button)
-                buttons [button] = (char) joysticks()->at (i)->buttons [button];
+            int buttons = 0;
+            for (int button = 0; button < numButtons; ++button) {
+                bool pressed = joysticks()->at (i)->buttons [button];
+                buttons += pressed ? qPow (2, button) : 0;
+            }
 
-            data.append (joysticks()->at (i)->numButtons);
-            data.append (bitsToBytes (buttons));
+            data.append (numButtons);
+
+            ShortToBytes buttonData;
+            buttonData.setData (buttons);
+            data.append (buttonData.byte1);
+            data.append (buttonData.byte2);
         }
 
         /* Add hat/pov data */
         if (numPovHats > 0) {
             data.append (numPovHats);
             for (int hat = 0; hat < numPovHats; ++hat) {
-                int value = joysticks()->at (i)->povHats [hat];
-                if (value <= 0) value = -1;
-
-                data.append (value);
-                data.append (value);
+                ShortToBytes povData;
+                povData.setData (joysticks()->at (i)->povHats [hat]);
+                data.append (povData.byte1);
+                data.append (povData.byte2);
             }
         }
     }
@@ -271,7 +285,7 @@ QByteArray DS_Protocol2015::generateTimezoneData() {
     QByteArray data;
 
     /* Add size (always 11) */
-    data.append (0x0B);
+    data.append ((quint8) 0x0B);
 
     /* Get current date/time */
     QDateTime dt = QDateTime::currentDateTime();
@@ -280,14 +294,14 @@ QByteArray DS_Protocol2015::generateTimezoneData() {
 
     /* Add current date/time */
     data.append (pHeaderTime);
-    data.append (time.msec() / 0xFF);
-    data.append (time.msec() - (time.msec() / 0xFF));
+    data.append (time.msec() / 255);
+    data.append (time.msec() - (time.msec() / 255));
     data.append (time.second());
     data.append (time.minute());
     data.append (time.hour());
     data.append (date.day());
     data.append (date.month());
-    data.append (date.year() - 0x76C);
+    data.append (date.year() - 1900);
 
     /* Add timezone data */
     data.append (DS_GetTimezoneCode().length() + 1);
@@ -298,78 +312,78 @@ QByteArray DS_Protocol2015::generateTimezoneData() {
 }
 
 DS_ControlMode DS_Protocol2015::getControlMode (int byte) {
+    DS_ControlMode mode = kControlEmergencyStop;
+
     switch (byte) {
     case pControlDisabled:
-        return kControlDisabled;
+        mode = kControlDisabled;
         break;
     case pControlTeleoperated:
-        return kControlTeleoperated;
+        mode = kControlTeleoperated;
         break;
     case pControlTest:
-        return kControlTest;
+        mode = kControlTest;
         break;
     case pControlAutonomous:
-        return kControlAutonomous;
-        break;
-    case pControlNoCommunication:
-        return kControlNoCommunication;
+        mode = kControlAutonomous;
         break;
     }
 
-    return kControlEmergencyStop;
+    return mode;
 }
 
-char DS_Protocol2015::getControlCode (DS_ControlMode mode) {
+int DS_Protocol2015::getControlCode (DS_ControlMode mode) {
+    quint8 byte = pControlDisabled;
+
     switch (mode) {
     case kControlTest:
-        return pControlTest;
+        byte = pControlTest;
         break;
     case kControlTeleoperated:
-        return pControlTeleoperated;
+        byte = pControlTeleoperated;
         break;
     case kControlDisabled:
-        return pControlDisabled;
+        byte = pControlDisabled;
         break;
     case kControlAutonomous:
-        return pControlAutonomous;
+        byte = pControlAutonomous;
         break;
     case kControlEmergencyStop:
-        return pControlEmmergencyStop;
-        break;
-    case kControlNoCommunication:
-        return pControlNoCommunication;
+        byte = pControlEmergencyStop;
         break;
     }
 
-    return pControlDisabled;
+    return byte;
 }
 
-char DS_Protocol2015::getAllianceCode (DS_Alliance alliance) {
+int DS_Protocol2015::getAllianceCode (DS_Alliance alliance) {
+    quint8 byte = pRed1;
+
     switch (alliance) {
     case kAllianceRed1:
-        return pRed1;
+        byte = pRed1;
         break;
     case kAllianceRed2:
-        return pRed2;
+        byte = pRed2;
         break;
     case kAllianceRed3:
-        return pRed3;
+        byte = pRed3;
         break;
     case kAllianceBlue1:
-        return pBlue1;
+        byte = pBlue1;
         break;
     case kAllianceBlue2:
-        return pBlue2;
+        byte = pBlue2;
         break;
     case kAllianceBlue3:
-        return pBlue3;
+        byte = pBlue3;
         break;
     }
 
-    return pRed1;
+    return byte;
 }
 
-char DS_Protocol2015::getJoystickSize (DS_Joystick* joystick) {
+int DS_Protocol2015::getJoystickSize (DS_Joystick* joystick) {
     return  5
             + (joystick->numAxes > 0 ? joystick->numAxes : 0)
             + (joystick->numButtons / 8)

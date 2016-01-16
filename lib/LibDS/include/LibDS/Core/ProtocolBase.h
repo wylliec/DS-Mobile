@@ -26,12 +26,12 @@
 
 #include <QBitArray>
 #include <QHostInfo>
+#include <QTcpSocket>
 #include <QNetworkReply>
 
 #include "LibDS/Core/Common.h"
-#include "Watchdog.h"
-
-#include "Discovery/Discovery.h"
+#include "LibDS/Core/Watchdog.h"
+#include "LibDS/Core/Discovery/Discovery.h"
 
 /**
  * \class DS_Protocol
@@ -87,6 +87,11 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
     DS_ControlMode controlMode() const;
 
     /**
+     * Returns the current communication status
+     */
+    DS_CommunicationStatus communicationStatus() const;
+
+    /**
      * A list with the input data of the joysticks. This is just a reference
      * to the joystick list in the protocol manager.
      */
@@ -98,7 +103,10 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
     QString radioAddress();
 
     /**
-     * Returns the default robot address or the custom robot address
+     * Returns the default robot address or the custom robot address.
+     *
+     * If there is no custom address set, the function may return the robot
+     * address or the fallback address (10.XX.YY.2)
      */
     QString robotAddress();
 
@@ -121,10 +129,26 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
      */
     virtual int clientPort() = 0;
 
+    /**
+     * Returns the default radio address
+     *
+     * \note This function must be implemented by each protocol
+     */
+    virtual QString defaultRadioAddress() = 0;
+
+    /**
+     * Returns the default robot address
+     *
+     * \note This function must be implemented by each protocol
+     */
+    virtual QString defaultRobotAddress() = 0;
+
   public slots:
     /**
      * Resets the internal values of the protocol and emits the appropiate
-     * signals when the robot communication is lost
+     * signals when the robot communication is lost.
+     *
+     * After doing that, the function will try to ping the robot again
      */
     void reset();
 
@@ -182,9 +206,14 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
 
     /**
      * Emitted when the state of the network communications with the robot
-     * has been changed
+     * has been changed. Unlike the other signals with a \c bool value, this
+     * signal contains more information about the communication status, such
+     * as:
+     *     - The robot responds ping requests, but does not respond to DS
+     *     - The robot responds to ping requests and DS
+     *     - The robot does not respond to ping requests nor the DS
      */
-    void communicationsChanged (bool);
+    void communicationsChanged (DS_CommunicationStatus);
 
     /**
      * Emitted when the protocol detects that the robot voltage has changed
@@ -270,20 +299,6 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
 
   protected:
     /**
-     * Returns the default radio address
-     *
-     * \note This function must be implemented by each protocol
-     */
-    virtual QString defaultRadioAddress() = 0;
-
-    /**
-     * Returns the default robot address
-     *
-     * \note This function must be implemented by each protocol
-     */
-    virtual QString defaultRobotAddress() = 0;
-
-    /**
      * Uses the joystick input information to generate a data array to be
      * sent along the client packet
      *
@@ -320,7 +335,7 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
      *
      * \note This function must be implemented by each protocol
      */
-    virtual char getControlCode (DS_ControlMode mode) = 0;
+    virtual int getControlCode (DS_ControlMode mode) = 0;
 
     /**
      * Returns the code used by the protocol to represent the selected
@@ -328,7 +343,7 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
      *
      * \note This function must be implemented by each protocol
      */
-    virtual char getAllianceCode (DS_Alliance alliance) = 0;
+    virtual int getAllianceCode (DS_Alliance alliance) = 0;
 
     /**
      * Calculates the size of the \a joystick.
@@ -337,12 +352,7 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
      *
      * \note This function must be implemented by each protocol
      */
-    virtual char getJoystickSize (DS_Joystick* joystick) = 0;
-
-    /**
-     * Converts the input \a bits to bytes
-     */
-    QByteArray bitsToBytes (QBitArray bits);
+    virtual int getJoystickSize (DS_Joystick* joystick) = 0;
 
     /**
      * Changes the current robot \a status
@@ -362,13 +372,13 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
     /**
      * Changes the state of the communications and emits the appropiate signals
      */
-    void updateCommunications (bool available);
+    void updateCommunications (DS_CommunicationStatus status);
 
     /**
      * 'Calculcates' the voltage from the values of the \a major and \a minor
      * parameters and emits the appropiate signals
      */
-    void updateVoltage (char major, char minor);
+    void updateVoltage (int major, int minor);
 
   private:
     /**
@@ -386,6 +396,13 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
     int m_status;
 
     /**
+     * Holds the number of times the \c reset() function was called.
+     * We use it to toggle the usage of the fallback robot address every certain
+     * number of protocol resets.
+     */
+    int m_resetCount;
+
+    /**
      * Represents the number of packets sent to the robot
      */
     int m_sentPackets;
@@ -396,10 +413,17 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
     bool m_robotCode;
 
     /**
-     * This variable should be set to \c true when the robot responds to
-     * the packets that we send to the robot
+     * If set to \c true, the protocol will send data to the robot radio
+     * instead of the robot address.
+     *
+     * This value is toggled automatically on each robot reset
      */
-    bool m_robotCommunication;
+    bool m_useFallbackAddress;
+
+    /**
+     * Holds the communication status of the robot
+     */
+    DS_CommunicationStatus m_communicationStatus;
 
     /**
      * If set to \c true, you should send the current date time data
@@ -452,11 +476,28 @@ class LIB_DS_DECL DS_ProtocolBase : public QObject {
      */
     QList<DS_Joystick*>* m_joysticks;
 
+    /**
+     * Used for pinging the robot
+     */
+    QTcpSocket m_pingSocket;
+
   private slots:
     /**
-     * Changes the address of the robot to the robot's IP
+     * Pings the robot using a TCP socket
      */
-    void onAddressResolved (QString address, QString ip);
+    void pingRobot();
+
+    /**
+     * Changes the address of the robot to the robot's IP and then tries to
+     * ping the robot to get the connection status
+     */
+    void onIpFound (QString address, QString ip);
+
+    /**
+     * Called when the connection state between the robot TCP connection and
+     * the client is changed
+     */
+    void onStateChanged (QAbstractSocket::SocketState state);
 };
 
 #endif

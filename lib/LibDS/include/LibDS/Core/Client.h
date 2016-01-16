@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2015 WinT 3794 <http://wint3794.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -38,6 +38,7 @@ class LIB_DS_DECL DS_Client : public QObject {
 
   public:
     explicit DS_Client();
+    ~DS_Client();
 
   public slots:
     /**

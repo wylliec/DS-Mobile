@@ -40,6 +40,8 @@ class LIB_DS_DECL DS_Protocol2015 : public DS_ProtocolBase {
 
     int robotPort();
     int clientPort();
+    QString defaultRadioAddress();
+    QString defaultRobotAddress();
 
   public slots:
     void reboot();
@@ -52,17 +54,18 @@ class LIB_DS_DECL DS_Protocol2015 : public DS_ProtocolBase {
     void onDownloadFinished (QNetworkReply* reply);
 
   private:
-    QString defaultRadioAddress();
-    QString defaultRobotAddress();
     QByteArray generateClientPacket();
     QByteArray generateJoystickData();
     QByteArray generateTimezoneData();
     DS_ControlMode getControlMode (int byte);
 
-    char getControlCode (DS_ControlMode mode);
-    char getAllianceCode (DS_Alliance alliance);
-    char getJoystickSize (DS_Joystick* joystick);
+    int getControlCode (DS_ControlMode mode);
+    int getAllianceCode (DS_Alliance alliance);
+    int getJoystickSize (DS_Joystick* joystick);
 
+    /**
+     * Used for downloading robot information over a FTP connection.
+     */
     QNetworkAccessManager m_manager;
 };
 

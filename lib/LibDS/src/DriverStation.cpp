@@ -46,14 +46,14 @@ DriverStation::DriverStation() {
     /* Update internal values and notify object on robot status events */
     connect (m_manager, SIGNAL (codeChanged           (bool)),
              this,      SLOT   (updateStatus          (bool)));
-    connect (m_manager, SIGNAL (communicationsChanged (bool)),
-             this,      SLOT   (updateStatus          (bool)));
+    connect (m_manager, SIGNAL (communicationsChanged (DS_CommunicationStatus)),
+             this,      SLOT   (updateStatus          (DS_CommunicationStatus)));
     connect (m_manager, SIGNAL (controlModeChanged    (DS_ControlMode)),
              this,      SLOT   (onControlModeChanged  (DS_ControlMode)));
     connect (m_manager, SIGNAL (codeChanged           (bool)),
              this,      SIGNAL (codeChanged           (bool)));
-    connect (m_manager, SIGNAL (communicationsChanged (bool)),
-             this,      SIGNAL (communicationsChanged (bool)));
+    connect (m_manager, SIGNAL (communicationsChanged (DS_CommunicationStatus)),
+             this,      SIGNAL (communicationsChanged (DS_CommunicationStatus)));
     connect (m_manager, SIGNAL (controlModeChanged    (DS_ControlMode)),
              this,      SIGNAL (controlModeChanged    (DS_ControlMode)));
     connect (m_manager, SIGNAL (diskUsageChanged      (int)),
@@ -64,7 +64,7 @@ DriverStation::DriverStation() {
              this,      SIGNAL (voltageChanged        (QString)));
 
     /* Stop timer when the communications status changes */
-    connect (m_manager,     SIGNAL (communicationsChanged (bool)),
+    connect (m_manager,     SIGNAL (communicationsChanged (DS_CommunicationStatus)),
              m_elapsedTime, SLOT   (stop()));
 
     /* Robot information has changed */
@@ -92,8 +92,8 @@ DriverStation::DriverStation() {
     /* Send and read robot packets */
     connect (m_client,  SIGNAL (dataReceived     (QByteArray)),
              this,      SLOT   (readRobotPackets (QByteArray)));
-    connect (DS_Timers::getInstance(), SIGNAL (timeout20()),
-             this,                     SLOT   (sendRobotPackets()));
+    connect (DS_Timers::getInstance(), SIGNAL    (timeout20()),
+             this,                     SLOT      (sendRobotPackets()));
 }
 
 DriverStation::~DriverStation() {
@@ -150,11 +150,18 @@ QString DriverStation::robotAddress() {
     return "";
 }
 
+QString DriverStation::defaultRobotAddress() {
+    if (m_manager->protocolIsValid())
+        return m_manager->protocol()->defaultRobotAddress();
+
+    return "";
+}
+
 DS_ControlMode DriverStation::controlMode() {
     if (m_manager->protocolIsValid())
         return m_manager->protocol()->controlMode();
 
-    return kControlNoCommunication;
+    return kControlDisabled;
 }
 
 bool DriverStation::robotHasCode() {
@@ -223,10 +230,10 @@ void DriverStation::startPractice (int countdown,
     autonomous *= 1000;
 
     /* Calculate the time frames */
-    int _startAutonomous = countdown;
-    int _startTeleoperated = _startAutonomous + delay + autonomous;
-    int _startEndGame = _startTeleoperated + delay + teleop - endgame;
-    int _stop = _startEndGame + endgame;
+    quint32 _startAutonomous = countdown;
+    quint32 _startTeleoperated = _startAutonomous + delay + autonomous;
+    quint32 _startEndGame = _startTeleoperated + delay + teleop - endgame;
+    quint32 _stop = _startEndGame + endgame;
 
     /* Configure the sound/media timers */
     QTimer::singleShot (_startAutonomous, Qt::PreciseTimer,
@@ -307,44 +314,35 @@ void DriverStation::clearJoysticks() {
     m_manager->clearJoysticks();
 }
 
-void DriverStation::updateJoystickPovHat (int js,
-        int hat,
-        int angle) {
+void DriverStation::updateJoystickPovHat (int js, int hat, int angle) {
     if (m_manager->protocolIsValid())
         m_manager->updateJoystickPovHat (js, hat, angle);
 }
 
-void DriverStation::addJoystick (int axes,
-                                 int buttons,
-                                 int povHats) {
+void DriverStation::addJoystick (int axes, int buttons, int povHats) {
     if (m_manager->protocolIsValid())
         m_manager->addJoystick (axes, buttons, povHats);
 }
 
-void DriverStation::updateJoystickAxis (int js,
-                                        int axis,
-                                        double value) {
+void DriverStation::updateJoystickAxis (int js, int axis, double value) {
     if (m_manager->protocolIsValid())
         m_manager->updateJoystickAxis (js, axis, value);
 }
 
-void DriverStation::updateJoystickButton (int js,
-        int button,
-        bool state) {
+void DriverStation::updateJoystickButton (int js, int button, bool state) {
     if (m_manager->protocolIsValid())
         m_manager->updateJoystickButton (js, button, state);
 }
 
 QString DriverStation::getStatus() {
-    if (m_manager->protocolIsValid()) {
-        if (m_manager->protocol()->isConnected()
-                && !m_manager->protocol()->robotCode())
+    if (m_manager->protocolIsValid() && m_manager->protocol()->isConnected()) {
+        if (!m_manager->protocol()->robotCode())
             return "No Robot Code";
 
         return DS_GetControlModeString (m_manager->protocol()->controlMode());
     }
 
-    return DS_GetControlModeString (kControlNoCommunication);
+    return QString ("No Robot Communication");
 }
 
 void DriverStation::sendRobotPackets() {
@@ -357,9 +355,9 @@ void DriverStation::resetInternalValues() {
     m_elapsedTime->stop();
 
     emit codeChanged (false);
-    emit communicationsChanged (false);
     emit voltageChanged (QString (""));
     emit elapsedTimeChanged ("00:00.0");
+    emit communicationsChanged (kFailing);
 }
 
 void DriverStation::readRobotPackets (QByteArray robotResponse) {
@@ -372,10 +370,13 @@ void DriverStation::updateStatus (bool ignored) {
     emit robotStatusChanged (getStatus());
 }
 
+void DriverStation::updateStatus (DS_CommunicationStatus ignored) {
+    Q_UNUSED (ignored);
+    emit robotStatusChanged (getStatus());
+}
+
 void DriverStation::onControlModeChanged (DS_ControlMode mode) {
-    if (mode == kControlEmergencyStop
-            || mode == kControlDisabled
-            || mode == kControlNoCommunication)
+    if (mode == kControlEmergencyStop || mode == kControlDisabled)
         m_elapsedTime->stop();
 
     else

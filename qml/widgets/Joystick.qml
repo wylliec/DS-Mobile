@@ -23,17 +23,115 @@
 import QtQuick 2.4
 import Material 0.1
 
-Item {
-    function hide() {
-        height = 0
-        opacity = 0
+Column {
+    anchors {
+        left: parent.left
+        right: parent.right
     }
 
-    function show() {
-        opacity = 1
-        height = implicitHeight
+    Repeater {
+        model: 2
+        delegate: Column {
+            Grid {
+                spacing: 5
+                columns: 6
+
+                Repeater {
+                    model: 12
+                    delegate: Button {
+                        text: qsTr ("" + (index + 1))
+                        elevation: checked ? 0 : 1
+                        width: 100
+                        checkable: true
+
+//                        onClicked: {
+//                            c_ds.updateJoystickButton (js, index, checked)
+//                            snackbar.open (qsTr ("joystick #" + (js + 1) + " button #" + (index + 1) + (checked ? " clicked" : " unclicked" )))
+//                        }
+
+                        onPressedChanged: {
+                            checked = pressed
+                            c_ds.updateJoystickButton (js, index, pressed)
+                            snackbar.open (qsTr ("joystick #" + (js + 1) + " button #" + (index + 1) + (pressed ? " clicked" : " unclicked" )))
+                        }
+                    }
+                }
+            }
+
+            Item {
+                width:  Units.dp (10)
+                height: Units.dp (10)
+            }
+
+            Repeater {
+                model: 3
+                delegate: Slider {
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    minimumValue: -1.0
+
+                    onValueChanged: {
+                        if(Math.abs(value) < 0.1) {
+                            value = 0
+                        }
+
+                        c_ds.updateJoystickAxis (js, index, value)
+                        snackbar.open (qsTr ("joystick #" + (js + 1) + " slider #" + (index + 1) + " changed to " + value.toFixed(3)))
+                    }
+                }
+            }
+
+            property int js: index
+        }
     }
 
-    Behavior on height  {NumberAnimation{}}
-    Behavior on opacity {NumberAnimation{}}
-}
+//    Row {
+//        spacing: 30
+
+//        Repeater {
+//            model: 2
+//            delegate: Rectangle {
+//                width: 300
+//                height: width
+//                color: "white"
+//                radius: width*0.5
+
+//                Rectangle {
+//                    width: parent.width*0.5
+//                    height: width
+//                    color: "black"
+//                    radius: width*0.5
+
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                    anchors.verticalCenter: parent.verticalCenter
+
+//                    MouseArea {
+//                        anchors.fill: parent
+
+//                        function press (mouse) {
+//                            parent.x = mouse.x
+//                            parent.y = mouse.y
+//                            parent.
+//                            snackbar.open (qsTr ("joystick #" + (index + 1) + " pressed. x:" + mouse.x + ", y:" + mouse.y))
+//                        }
+
+//                        function change (mouse) {
+//                            snackbar.open (qsTr ("joystick #" + (index + 1) + " changed. x:" + mouse.x + ", y:" + mouse.y))
+//                        }
+
+//                        function release (mouse) {
+//                            snackbar.open (qsTr ("joystick #" + (index + 1) + " released"))
+//                        }
+
+//                        onPressed: press(mouse)
+//                        onPositionChanged: change(mouse)
+//                        onReleased: release(mouse)
+//                    }
+//               }
+//           }
+//        }
+//    }
+ }

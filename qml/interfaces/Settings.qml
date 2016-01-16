@@ -29,10 +29,10 @@ Object {
     id: settings
 
     /* Driver Station stuff */
-    property int teamNumber: c_settings.getNumber ("Team", 0)
+    property int teamNumber: c_settings.getNumber ("Team", 3223)
     property int position: c_settings.getNumber ("Position", 0)
     property bool allianceIsBlue: c_settings.getBool ("Blue", false)
-    property string robotAddress: c_settings.get ("Address", "")
+    property string robotAddress: c_settings.get ("Address", "10.32.23.22")
     property bool firstLaunch: c_settings.getBool ("First Launch", true)
 
     /* Window-related stuff */
@@ -67,6 +67,8 @@ Object {
         c_ds.init()
         c_ds.setTeamNumber (teamNumber)
         c_ds.setCustomAddress (robotAddress)
+        c_ds.addJoystick(3,12,1);
+        c_ds.addJoystick(3,12,1);
         updateAlliance()
     }
 
@@ -89,16 +91,16 @@ Object {
         if (allianceIsBlue) {
             switch (position) {
             case 0:
-                c_ds.setAlliance (c_ds.Blue1)
+                c_ds.setAlliance (c_ds.kAllianceBlue1)
                 break
             case 1:
-                c_ds.setAlliance (c_ds.Blue2)
+                c_ds.setAlliance (c_ds.kAllianceBlue2)
                 break
             case 2:
-                c_ds.setAlliance (c_ds.Blue3)
+                c_ds.setAlliance (c_ds.kAllianceBlue3)
                 break
             default:
-                c_ds.setAlliance (c_ds.Blue1)
+                c_ds.setAlliance (c_ds.kAllianceBlue1)
                 break
             }
         }
@@ -107,16 +109,16 @@ Object {
         else {
             switch (position) {
             case 0:
-                c_ds.setAlliance (c_ds.Red1)
+                c_ds.setAlliance (c_ds.kAllianceRed1)
                 break
             case 1:
-                c_ds.setAlliance (c_ds.Red2)
+                c_ds.setAlliance (c_ds.kAllianceRed2)
                 break
             case 2:
-                c_ds.setAlliance (c_ds.Red3)
+                c_ds.setAlliance (c_ds.kAllianceRed3)
                 break
             default:
-                c_ds.setAlliance (c_ds.Red1)
+                c_ds.setAlliance (c_ds.kAllianceRed1)
                 break
             }
         }

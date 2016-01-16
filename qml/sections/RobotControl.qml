@@ -40,6 +40,7 @@ Item {
         {
         case 0:
             controls.hide()
+            joysticks.show()
             c_ds.startTeleoperated()
             break
         case 1:
@@ -58,6 +59,7 @@ Item {
     }
 
     function disableRobot() {
+        joysticks.hide()
         controls.show()
         button.checked = false
         c_ds.startDisabled()
@@ -66,7 +68,7 @@ Item {
     Connections {
         target: c_ds
         onCodeChanged: code.available = available
-        onCommunicationsChanged: communications.available = available
+        onCommunicationsChanged: communications.available = !!status
     }
 
     Snackbar {
@@ -87,13 +89,16 @@ Item {
         function hide() {
             height = 0
             opacity = 0
+            visible = false
         }
 
         function show() {
             opacity = 1
             height = implicitHeight
+            visible = true
         }
 
+        Behavior on height  {NumberAnimation{}}
         Behavior on opacity {NumberAnimation{}}
 
         Label {
@@ -193,6 +198,43 @@ Item {
         }
     }
 
+    Column {
+        id: joysticks
+
+        function hide() {
+            height = 0
+            opacity = 0
+            visible = false
+        }
+
+        function show() {
+            opacity = 1
+            height = implicitHeight
+            visible = true
+        }
+
+        Behavior on height  {NumberAnimation{}}
+        Behavior on opacity {NumberAnimation{}}
+
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: controls.bottom
+            margins: Units.dp (20)
+            topMargin: 0
+        }
+
+        Joystick {
+            id: joy
+
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+
+        }
+    }
+
     Button {
         id: button
         elevation: 1
@@ -203,9 +245,9 @@ Item {
         anchors {
             left: parent.left
             right: parent.right
-            top: controls.bottom
+            top: joysticks.bottom
             margins: Units.dp (20)
-            topMargin: controls.height > 0 ? Units.dp (20) : Units.dp (0)
+            //topMargin: controls.height > 0 ? Units.dp (20) : Units.dp (0)
         }
 
         onClicked: {
@@ -216,6 +258,7 @@ Item {
                 disableRobot()
                 snackbar.open (qsTr ("Cannot enable robot with current conditions"))
             }
+            //enableRobot()
         }
     }
 }

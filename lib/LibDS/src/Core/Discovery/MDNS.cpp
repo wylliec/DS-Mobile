@@ -27,8 +27,16 @@ MDNS::MDNS() {
     connect (&m_IPv4_receiver, SIGNAL (readyRead()), this, SLOT (readIPv4Socket()));
     connect (&m_IPv6_receiver, SIGNAL (readyRead()), this, SLOT (readIPv6Socket()));
 
-    m_IPv4_receiver.bind (5353, QUdpSocket::ShareAddress);
-    m_IPv6_receiver.bind (5353, QUdpSocket::ShareAddress);
+    QUdpSocket::BindFlag flag = QUdpSocket::ShareAddress;
+    m_IPv6_receiver.bind (QHostAddress ("FF02::FB"),    5353, flag);
+    m_IPv4_receiver.bind (QHostAddress ("224.0.0.251"), 5353, flag);
+}
+
+MDNS::~MDNS() {
+    m_IPv4_sender.abort();
+    m_IPv6_sender.abort();
+    m_IPv4_receiver.abort();
+    m_IPv6_receiver.abort();
 }
 
 void MDNS::query (QString domain) {
@@ -37,21 +45,20 @@ void MDNS::query (QString domain) {
     QByteArray packet;
 
     /* Ensure that the domain is valid */
-    domain = domain.toLower();
     domain = domain.replace (".local.", "");
     domain = domain.replace (".local",  "");
 
     /* Check that domain length is valid */
-    if (domain.length() > 0xff)
+    if (domain.length() > 0xFF)
         return;
 
-    /* Create header */
+    /* Create header & flags */
     header.append ((char) 0x00);
     header.append ((char) 0x00);
     header.append ((char) 0x00);
     header.append ((char) 0x00);
     header.append ((char) 0x00);
-    header.append ((char) 0x01);
+    header.append ((char) 0x02);
     header.append ((char) 0x00);
     header.append ((char) 0x00);
     header.append ((char) 0x00);
@@ -70,6 +77,12 @@ void MDNS::query (QString domain) {
     data.append ((char) 0x00);
     data.append ((char) 0x00);
     data.append ((char) 0x01);
+    data.append ((char) 0x00);
+    data.append ((char) 0x01);
+    data.append ((char) 0xC0);
+    data.append ((char) 0x0C);
+    data.append ((char) 0x00);
+    data.append ((char) 0x1C);
     data.append ((char) 0x00);
     data.append ((char) 0x01);
 
@@ -91,11 +104,12 @@ void MDNS::readIPv6Socket() {
 
 void MDNS::send (QByteArray data) {
     if (!data.isEmpty()) {
-        m_IPv4_sender.writeDatagram (data, QHostAddress ("224.0.0.251"), 5353);
         m_IPv6_sender.writeDatagram (data, QHostAddress ("FF02::FB"),    5353);
+        m_IPv4_sender.writeDatagram (data, QHostAddress ("224.0.0.251"), 5353);
     }
 }
 
 void MDNS::processResponse (QByteArray response) {
-    Q_UNUSED (response);
+    /* TODO */
+    qDebug() << response.toHex();
 }
