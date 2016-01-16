@@ -258,7 +258,6 @@ Item {
                 disableRobot()
                 snackbar.open (qsTr ("Cannot enable robot with current conditions"))
             }
-            //enableRobot()
         }
     }
 }

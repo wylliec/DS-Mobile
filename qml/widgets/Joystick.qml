@@ -40,19 +40,12 @@ Column {
                     model: 12
                     delegate: Button {
                         text: qsTr ("" + (index + 1))
-                        elevation: checked ? 0 : 1
+                        elevation: pressed ? 0 : 1
                         width: 100
-                        checkable: true
-
-//                        onClicked: {
-//                            c_ds.updateJoystickButton (js, index, checked)
-//                            snackbar.open (qsTr ("joystick #" + (js + 1) + " button #" + (index + 1) + (checked ? " clicked" : " unclicked" )))
-//                        }
 
                         onPressedChanged: {
-                            checked = pressed
                             c_ds.updateJoystickButton (js, index, pressed)
-                            snackbar.open (qsTr ("joystick #" + (js + 1) + " button #" + (index + 1) + (pressed ? " clicked" : " unclicked" )))
+                            snackbar.open (qsTr ("joystick #" + (js + 1) + " button #" + (index + 1) + (pressed ? " pressed" : " released" )))
                         }
                     }
                 }
@@ -64,7 +57,7 @@ Column {
             }
 
             Repeater {
-                model: 3
+                model: 1
                 delegate: Slider {
                     anchors {
                         left: parent.left
@@ -78,8 +71,8 @@ Column {
                             value = 0
                         }
 
-                        c_ds.updateJoystickAxis (js, index, value)
-                        snackbar.open (qsTr ("joystick #" + (js + 1) + " slider #" + (index + 1) + " changed to " + value.toFixed(3)))
+                        c_ds.updateJoystickAxis (js, index + 2, value)
+                        snackbar.open (qsTr ("joystick #" + (js + 1) + " slider #" + (index + 2 + 1) + " changed to " + value.toFixed(3)))
                     }
                 }
             }
@@ -88,50 +81,61 @@ Column {
         }
     }
 
-//    Row {
-//        spacing: 30
+    Row {
+        spacing: 30
 
-//        Repeater {
-//            model: 2
-//            delegate: Rectangle {
-//                width: 300
-//                height: width
-//                color: "white"
-//                radius: width*0.5
+        Repeater {
+            id: circles
+            model: 2
+            delegate: Rectangle {
+                width: 300
+                height: width
+                color: "white"
+                radius: width*0.5
 
-//                Rectangle {
-//                    width: parent.width*0.5
-//                    height: width
-//                    color: "black"
-//                    radius: width*0.5
+                Rectangle {
+                    id: knob
+                    width: parent.width*0.5
+                    height: width
+                    color: "black"
+                    radius: width*0.5
+                    x: parent.knobX - width*0.5
+                    y: parent.knobY - height*0.5
 
-//                    anchors.horizontalCenter: parent.horizontalCenter
-//                    anchors.verticalCenter: parent.verticalCenter
+                    //anchors.horizontalCenter: parent.horizontalCenter
+                    //anchors.verticalCenter: parent.verticalCenter
+               }
 
-//                    MouseArea {
-//                        anchors.fill: parent
+                MouseArea {
+                    anchors.fill: parent
 
-//                        function press (mouse) {
-//                            parent.x = mouse.x
-//                            parent.y = mouse.y
-//                            parent.
-//                            snackbar.open (qsTr ("joystick #" + (index + 1) + " pressed. x:" + mouse.x + ", y:" + mouse.y))
-//                        }
+                    function press (mouse) {
+                        var xPos = Math.min(Math.max(mouse.x, parent.width/4), parent.width*3/4),
+                            yPos = Math.min(Math.max(mouse.y, parent.height/4), parent.height*3/4)
+                        c_ds.updateJoystickAxis (index, 0, xPos*4/parent.width-2)
+                        c_ds.updateJoystickAxis (index, 1, 2-yPos*4/parent.height)
+                        circles.itemAt(index).knobX = xPos
+                        circles.itemAt(index).knobY = yPos
+                        snackbar.open (qsTr ("joystick #" + (index + 1) + " pressed. x:" + (xPos*4/parent.width-2).toFixed(3) + ", y:" + (2-yPos*4/parent.height).toFixed(3)))
+                    }
 
-//                        function change (mouse) {
-//                            snackbar.open (qsTr ("joystick #" + (index + 1) + " changed. x:" + mouse.x + ", y:" + mouse.y))
-//                        }
+                    function release (mouse) {
+                        c_ds.updateJoystickAxis (index, 0, 0)
+                        c_ds.updateJoystickAxis (index, 1, 0)
+                        circles.itemAt(index).knobX = parent.width/2
+                        circles.itemAt(index).knobY = parent.height/2
+                        snackbar.open (qsTr ("joystick #" + (index + 1) + " released"))
+                    }
 
-//                        function release (mouse) {
-//                            snackbar.open (qsTr ("joystick #" + (index + 1) + " released"))
-//                        }
+                    onPressed: press(mouse)
+                    onPositionChanged: press(mouse)
+                    onReleased: release(mouse)
 
-//                        onPressed: press(mouse)
-//                        onPositionChanged: change(mouse)
-//                        onReleased: release(mouse)
-//                    }
-//               }
-//           }
-//        }
-//    }
+                }
+
+                property int knobX: width/2
+                property int knobY: height/2
+           }
+        }
+    }
  }
